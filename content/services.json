@@ -1,0 +1,570 @@
+[
+ {
+  "slug": "ai-automation",
+  "name": "AI Automation",
+  "icon": "🤖",
+  "from": "From $490",
+  "short": "Automate leads, support and operations with AI workflows and agents.",
+  "meta": "Custom AI automation for UK, US and EU businesses: lead capture, AI chatbots, CRM and WhatsApp workflows and reporting. Book a free automation audit.",
+  "tiers": [
+   {
+    "name": "Automation Audit",
+    "desc": "Find the fastest wins.",
+    "price": "$490",
+    "per": " one-time",
+    "pop": false,
+    "pay": "",
+    "features": [
+     "Workflow and funnel review",
+     "AI opportunity roadmap with ROI estimate",
+     "1 workflow blueprint",
+     "60-minute strategy call"
+    ]
+   },
+   {
+    "name": "Workflow Build",
+    "desc": "Launch your first automations.",
+    "price": "$1,990",
+    "per": " one-time",
+    "pop": true,
+    "pay": "",
+    "features": [
+     "Up to 3 automated workflows",
+     "CRM, email and WhatsApp integrations",
+     "AI chatbot or lead qualifier",
+     "Team training and documentation",
+     "30-day support"
+    ]
+   },
+   {
+    "name": "AI Partner",
+    "desc": "Ongoing AI growth partner.",
+    "price": "$3,900",
+    "per": "/month",
+    "pop": false,
+    "pay": "",
+    "features": [
+     "Continuous workflow improvements",
+     "Custom AI agents and tools",
+     "Live dashboards and reports",
+     "Priority support",
+     "Monthly strategy session"
+    ]
+   }
+  ],
+  "hh": "Automate the *busywork*, keep the human touch",
+  "seo_title": "AI Automation Agency for UK, US & EU | Briefbox Digital",
+  "h1": "AI automation agency for UK, US & EU businesses",
+  "intro": "Briefbox Digital designs and builds AI automation that removes repetitive work from your sales, support and operations. We connect the tools you already use, such as your CRM, email, forms, WhatsApp and ad platforms, so leads are captured, qualified and followed up automatically while your team focuses on customers.",
+  "features": [
+   {
+    "t": "AI chatbots",
+    "d": "Website and WhatsApp assistants trained on your own content to answer questions and book calls."
+   },
+   {
+    "t": "Lead qualification",
+    "d": "Score and route new enquiries to the right person within seconds."
+   },
+   {
+    "t": "CRM automation",
+    "d": "Keep contacts, deals and follow-ups updated without manual data entry."
+   },
+   {
+    "t": "Email and WhatsApp flows",
+    "d": "Automatic replies, reminders and nurture sequences that sound like your brand."
+   },
+   {
+    "t": "Custom AI agents",
+    "d": "Task-specific agents for research, document handling and internal requests."
+   },
+   {
+    "t": "Reporting dashboards",
+    "d": "Live numbers from your tools in one place, with no spreadsheet exports."
+   }
+  ],
+  "sections": [
+   {
+    "h": "What AI automation can do for your business",
+    "p": "Most small and mid-sized teams lose hours every week copying data between tools, chasing leads and building reports. Automation handles these repeatable steps consistently, which shortens response times and reduces errors. We start with the tasks that cost you the most time and design the simplest workflow that solves them."
+   },
+   {
+    "h": "Tools we work with",
+    "p": "We build with n8n, Make and Zapier, and with direct API integrations when a platform needs more control. We connect common CRMs, Google Workspace, Microsoft 365, Slack, WhatsApp Business, Meta lead forms, Shopify and WordPress. If you already use a tool, we work with it instead of asking you to switch."
+   },
+   {
+    "h": "AI that is safe to use with customers",
+    "p": "Every AI assistant we build is limited to approved sources, has a clear handover to a human and keeps conversation logs for review. For UK and EU clients we design with GDPR principles in mind, including data minimization and clear consent wording."
+   },
+   {
+    "h": "Who it is for",
+    "p": "Our automation work suits service businesses, clinics, agencies, e-commerce brands and B2B teams that receive regular enquiries. Typical projects include instant lead replies, appointment booking flows, quote requests, onboarding sequences and internal approval workflows."
+   },
+   {
+    "h": "Results you can expect",
+    "p": "Clients typically see faster response times to new enquiries, fewer manual tasks for staff and cleaner data in their CRM. We agree measurable goals before building, such as response time, hours saved per week or leads handled automatically, and review them with you after launch so the automation keeps earning its place."
+   }
+  ],
+  "process": [
+   {
+    "t": "Audit",
+    "d": "We map your current workflow and find the highest-value automations."
+   },
+   {
+    "t": "Blueprint",
+    "d": "You approve a clear workflow diagram, tool list and timeline."
+   },
+   {
+    "t": "Build and test",
+    "d": "We build, test with real scenarios and document everything."
+   },
+   {
+    "t": "Launch and improve",
+    "d": "We train your team and refine the workflow based on real usage."
+   }
+  ],
+  "faq": [
+   {
+    "q": "What is AI automation?",
+    "a": "AI automation uses software and AI models to complete repeatable business tasks, such as answering enquiries, updating a CRM or sending follow-ups, without manual effort."
+   },
+   {
+    "q": "How long does an automation project take?",
+    "a": "A single workflow usually takes one to two weeks. Larger builds with several integrations or a custom AI agent take three to six weeks, depending on approvals and tool access."
+   },
+   {
+    "q": "Is AI automation GDPR compliant?",
+    "a": "We design workflows with GDPR and UK GDPR principles in mind and can document data flows for you. You remain the data controller, so we recommend reviewing your privacy notice with a legal adviser."
+   },
+   {
+    "q": "Do I need to change my current tools?",
+    "a": "No. We connect the tools you already use. We only suggest a new tool when it clearly saves money or removes a technical limit."
+   }
+  ]
+ },
+ {
+  "slug": "digital-marketing",
+  "name": "Digital Marketing",
+  "icon": "📈",
+  "from": "From $790/mo",
+  "short": "Google Ads, Meta Ads and tracking built for measurable growth.",
+  "meta": "Google Ads and Meta Ads management with accurate tracking, creative testing and clear reporting for brands in the USA, UK and Europe.",
+  "tiers": [
+   {
+    "name": "Launch",
+    "desc": "One platform, done properly.",
+    "price": "$790",
+    "per": "/month",
+    "pop": false,
+    "pay": "",
+    "features": [
+     "Google Ads or Meta Ads",
+     "Full tracking setup",
+     "Monthly performance report",
+     "Email support"
+    ]
+   },
+   {
+    "name": "Growth",
+    "desc": "Scale across both platforms.",
+    "price": "$1,590",
+    "per": "/month",
+    "pop": true,
+    "pay": "",
+    "features": [
+     "Google Ads and Meta Ads",
+     "Creative testing every month",
+     "Landing page recommendations",
+     "Weekly reporting",
+     "Bi-weekly strategy calls"
+    ]
+   },
+   {
+    "name": "Scale",
+    "desc": "Full-funnel performance.",
+    "price": "$2,990",
+    "per": "/month",
+    "pop": false,
+    "pay": "",
+    "features": [
+     "Multi-channel campaigns",
+     "CRO and A/B testing program",
+     "Email and CRM automation",
+     "Dedicated account manager",
+     "Management of $20k+ monthly ad spend"
+    ]
+   }
+  ],
+  "hh": "Paid media that is *measured*, not guessed",
+  "seo_title": "Digital Marketing & PPC Agency | Briefbox Digital",
+  "h1": "Digital marketing and PPC agency for growth-focused brands",
+  "intro": "Briefbox Digital plans, launches and optimizes Google Ads and Meta Ads campaigns for brands in the USA, UK and Europe. We set up tracking first, test creative continuously and report in plain language, so you always know what your advertising budget is producing.",
+  "features": [
+   {
+    "t": "Google Ads",
+    "d": "Search, Performance Max and YouTube campaigns built around real buying intent."
+   },
+   {
+    "t": "Meta Ads",
+    "d": "Facebook and Instagram campaigns with creative and audience testing."
+   },
+   {
+    "t": "Tracking setup",
+    "d": "Google Tag Manager, GA4, Meta Pixel and conversion events configured correctly."
+   },
+   {
+    "t": "Creative testing",
+    "d": "Structured tests of headlines, images and offers to find what converts."
+   },
+   {
+    "t": "Landing page feedback",
+    "d": "Practical recommendations to lift conversion on the pages your ads send to."
+   },
+   {
+    "t": "Clear reporting",
+    "d": "Weekly or monthly reports that focus on leads, cost per lead and revenue."
+   }
+  ],
+  "sections": [
+   {
+    "h": "Paid media built on accurate data",
+    "p": "Advertising only improves when the numbers are right. Before spending your budget we audit your tracking, define the conversions that matter and make sure each one is recorded in Google Ads, GA4 and Meta. This gives the platforms better signals and gives you trustworthy reports."
+   },
+   {
+    "h": "Google Ads and Meta Ads, managed together",
+    "p": "Search ads capture people who are already looking, while social ads create demand and retarget visitors. We plan both channels together, share learnings between them and avoid paying twice for the same customer."
+   },
+   {
+    "h": "Tracking you can trust",
+    "p": "We implement Google Tag Manager, GA4, the Meta Pixel and server-side or Conversions API events where useful. For UK and EU audiences we configure consent mode so tracking respects visitor choices and your privacy obligations."
+   },
+   {
+    "h": "Advertising in the US, UK and Europe",
+    "p": "Each market has different buying behavior, currencies, ad policies and legal requirements. We localize copy and offers, set sensible budgets per region and keep campaigns compliant with platform rules."
+   },
+   {
+    "h": "Reporting that makes sense",
+    "p": "Every report shows spend, leads, cost per lead and, where possible, revenue and return on ad spend. We explain what changed, why it changed and what we will do next, in plain language instead of dashboards full of jargon. You always keep access to your own ad accounts and analytics."
+   }
+  ],
+  "process": [
+   {
+    "t": "Audit and plan",
+    "d": "We review accounts, tracking and goals, then agree targets."
+   },
+   {
+    "t": "Launch",
+    "d": "Campaigns, creative and conversion tracking go live together."
+   },
+   {
+    "t": "Test and optimize",
+    "d": "We test weekly and move budget to what performs."
+   },
+   {
+    "t": "Report and scale",
+    "d": "You receive clear reports and a plan to scale what works."
+   }
+  ],
+  "faq": [
+   {
+    "q": "How much should I spend on ads?",
+    "a": "Budgets depend on your market and margins. Many small businesses start with a few thousand dollars per month across platforms. We recommend a test budget during the first month, then adjust using real results."
+   },
+   {
+    "q": "How long until I see results?",
+    "a": "Search campaigns can produce enquiries within days. Meaningful optimization usually takes four to eight weeks because platforms need data and we need time to test."
+   },
+   {
+    "q": "Do you work with ad spend I already have?",
+    "a": "Yes. You keep your own ad accounts and pay the platforms directly. We manage the campaigns and you retain full ownership and access."
+   },
+   {
+    "q": "Do you handle GDPR cookie consent?",
+    "a": "We configure Google Consent Mode and cookie-based tracking behavior. A compliant cookie banner and policy are still your responsibility, and we can advise on setup."
+   }
+  ]
+ },
+ {
+  "slug": "content",
+  "name": "Content",
+  "icon": "✍️",
+  "from": "From $490/mo",
+  "short": "Blogs, social posts and newsletters that build trust and bring leads.",
+  "meta": "Content marketing for brands in the USA, UK and Europe: blog articles, social media content and email newsletters that build trust and generate leads.",
+  "tiers": [
+   {
+    "name": "Starter",
+    "desc": "Stay visible every week.",
+    "price": "$490",
+    "per": "/month",
+    "pop": false,
+    "pay": "",
+    "features": [
+     "4 articles or posts per month",
+     "Brand voice guide",
+     "1 revision per piece",
+     "Publishing support"
+    ]
+   },
+   {
+    "name": "Growth",
+    "desc": "Build momentum.",
+    "price": "$990",
+    "per": "/month",
+    "pop": true,
+    "pay": "",
+    "features": [
+     "8 articles per month",
+     "Social media calendar",
+     "1 email newsletter",
+     "2 revisions per piece",
+     "Monthly content report"
+    ]
+   },
+   {
+    "name": "Authority",
+    "desc": "Own your category.",
+    "price": "$1,890",
+    "per": "/month",
+    "pop": false,
+    "pay": "",
+    "features": [
+     "16 content pieces per month",
+     "Video scripts and repurposing",
+     "Content strategy sessions",
+     "Unlimited revisions",
+     "Performance analytics"
+    ]
+   }
+  ],
+  "hh": "Content that builds *trust* and brings leads",
+  "seo_title": "Content Marketing Services | Briefbox Digital",
+  "h1": "Content marketing services that attract and convert",
+  "intro": "Briefbox Digital creates articles, social posts, email newsletters and video scripts that speak to your customers' real questions. We combine AI speed with human editing, so your content is consistent, accurate and recognizably yours, and every piece has a clear job in your sales funnel.",
+  "features": [
+   {
+    "t": "Blog articles",
+    "d": "Helpful long-form articles that answer the questions buyers ask before they enquire."
+   },
+   {
+    "t": "Social media content",
+    "d": "Planned posts and calendars for LinkedIn, Instagram, Facebook and X."
+   },
+   {
+    "t": "Email newsletters",
+    "d": "Regular emails that keep prospects and customers engaged."
+   },
+   {
+    "t": "Video scripts",
+    "d": "Short scripts for reels, explainers and ads, ready to film."
+   },
+   {
+    "t": "Content repurposing",
+    "d": "One idea turned into an article, several posts and an email."
+   },
+   {
+    "t": "Brand voice guide",
+    "d": "A short guide that keeps every writer and tool sounding like you."
+   }
+  ],
+  "sections": [
+   {
+    "h": "Why content marketing works",
+    "p": "Buyers research before they contact anyone. Useful articles, clear explanations and consistent posts help them trust you earlier, which makes your sales conversations easier and your ads more effective. Content also keeps working long after it is published."
+   },
+   {
+    "h": "Our content process",
+    "p": "We start with your customers, offers and sales cycle, then plan topics that match each stage. Every piece goes through drafting, human editing and fact checks, and you approve it before it is published."
+   },
+   {
+    "h": "AI-assisted, human-edited",
+    "p": "We use AI tools to research, outline and draft faster, then editors refine tone, check facts and add real examples. You get the speed of AI without generic, repetitive writing."
+   },
+   {
+    "h": "Content for US, UK and EU audiences",
+    "p": "We write in the spelling and tone your audience expects, use local examples where relevant and keep claims accurate and compliant, including for regulated topics such as health or finance."
+   },
+   {
+    "h": "Measuring content performance",
+    "p": "We track organic visits, engagement, leads and assisted conversions for each piece, then update or retire content based on the results. Over time this builds a library of pages that keeps attracting buyers and supports your ads, email and sales team."
+   }
+  ],
+  "process": [
+   {
+    "t": "Strategy",
+    "d": "We define audience, topics, tone and goals."
+   },
+   {
+    "t": "Plan",
+    "d": "You receive a monthly calendar to approve."
+   },
+   {
+    "t": "Create",
+    "d": "We write, edit and design each piece."
+   },
+   {
+    "t": "Publish and review",
+    "d": "We publish, measure and improve the plan monthly."
+   }
+  ],
+  "faq": [
+   {
+    "q": "How many pieces of content do I need?",
+    "a": "Consistency matters more than volume. Most businesses see good results from four to eight quality articles or equivalent posts per month, supported by social and email."
+   },
+   {
+    "q": "Do you use AI to write content?",
+    "a": "We use AI for research and first drafts, but every piece is edited and fact-checked by a person and follows your brand voice guide before you review it."
+   },
+   {
+    "q": "Can you publish content for me?",
+    "a": "Yes. We can publish to your website, blog, email platform and social accounts, or hand over finished files for your team to publish."
+   },
+   {
+    "q": "Who owns the content?",
+    "a": "After full payment you own the final content. We keep the right to reference the project in our portfolio unless you ask us not to."
+   }
+  ]
+ },
+ {
+  "slug": "web-development",
+  "name": "Web Development",
+  "icon": "💻",
+  "from": "From $890",
+  "short": "Fast, modern, mobile-first websites that convert visitors.",
+  "meta": "Fast, mobile-first web development for growing brands in the USA, UK and Europe: landing pages, business websites and e-commerce built to convert.",
+  "tiers": [
+   {
+    "name": "Landing Page",
+    "desc": "One page that converts.",
+    "price": "$890",
+    "per": " one-time",
+    "pop": false,
+    "pay": "",
+    "features": [
+     "1 custom responsive page",
+     "Tracking and pixels ready",
+     "Contact or booking form",
+     "14-day support"
+    ]
+   },
+   {
+    "name": "Business Website",
+    "desc": "Your full online presence.",
+    "price": "$2,490",
+    "per": " one-time",
+    "pop": true,
+    "pay": "",
+    "features": [
+     "Up to 8 pages",
+     "Blog and admin panel",
+     "Speed-optimised build",
+     "Analytics and pixel setup",
+     "30-day support"
+    ]
+   },
+   {
+    "name": "Custom and E-commerce",
+    "desc": "Built around your business.",
+    "price": "$5,900+",
+    "per": " one-time",
+    "pop": false,
+    "pay": "",
+    "features": [
+     "Custom design and development",
+     "Online store and payments",
+     "Custom integrations and automations",
+     "Advanced analytics",
+     "60-day support"
+    ]
+   }
+  ],
+  "hh": "Fast websites that turn visitors into *customers*",
+  "seo_title": "Web Development for Growing Brands | Briefbox Digital",
+  "h1": "Web development for brands that want to grow",
+  "intro": "Briefbox Digital builds fast, secure and mobile-first websites that are designed to generate enquiries and sales. Every site includes clean structure for search engines, analytics and tracking, a simple way to publish content and a design that reflects your brand, so you can launch quickly and keep improving.",
+  "features": [
+   {
+    "t": "Business websites",
+    "d": "Custom multi-page sites that explain your services and build trust."
+   },
+   {
+    "t": "Landing pages",
+    "d": "Focused pages for ad campaigns, tested and tracked."
+   },
+   {
+    "t": "E-commerce",
+    "d": "Online stores with payments, shipping rules and analytics."
+   },
+   {
+    "t": "Blog and content system",
+    "d": "Publish articles and pages yourself without touching code."
+   },
+   {
+    "t": "Speed and Core Web Vitals",
+    "d": "Lightweight builds that pass Google's performance checks."
+   },
+   {
+    "t": "Security and care plans",
+    "d": "HTTPS, backups and ongoing updates so your site stays safe."
+   }
+  ],
+  "sections": [
+   {
+    "h": "Websites built to convert",
+    "p": "A website should make your next step obvious. We plan page structure, messaging and calls to action around what visitors need to decide, then design a clean layout that works on every screen size."
+   },
+   {
+    "h": "Performance and technical foundations",
+    "p": "We build lightweight pages with optimized images, semantic markup, clear headings, structured data and fast hosting. These foundations improve user experience and help search engines understand your content."
+   },
+   {
+    "h": "Tracking and integrations",
+    "p": "Your site is delivered ready for Google Tag Manager, GA4, Meta Pixel and your CRM, booking or payment tools, so marketing and automation can start working from the first day."
+   },
+   {
+    "h": "Modern stack, simple editing",
+    "p": "We build with modern frameworks and static or CMS-based setups depending on your needs. You get an easy admin process for content, with hosting on reliable platforms such as Vercel or Cloudflare."
+   },
+   {
+    "h": "Launch checklist and ongoing support",
+    "p": "Before launch we test on real phones, tablets and desktops, check forms and tracking, set up redirects and submit your sitemap to Google Search Console. After launch we monitor performance and can provide a care plan covering updates, backups and small improvements."
+   }
+  ],
+  "process": [
+   {
+    "t": "Plan",
+    "d": "We agree goals, pages, structure and content."
+   },
+   {
+    "t": "Design",
+    "d": "You approve the look and feel before development."
+   },
+   {
+    "t": "Build and test",
+    "d": "We develop, test on real devices and connect tracking."
+   },
+   {
+    "t": "Launch and support",
+    "d": "We launch, monitor and provide post-launch support."
+   }
+  ],
+  "faq": [
+   {
+    "q": "How long does a website take?",
+    "a": "A landing page usually takes one to two weeks. A business website with several pages and a blog typically takes three to five weeks, depending on how quickly content and feedback arrive."
+   },
+   {
+    "q": "Can I edit the website myself?",
+    "a": "Yes. We provide a simple way to update pages, blog posts and key content, and we show your team how to use it."
+   },
+   {
+    "q": "Will my website be SEO friendly?",
+    "a": "We build with clean structure, fast loading, mobile-first layouts, metadata and structured data. Rankings also depend on content and competition, so we cannot guarantee positions."
+   },
+   {
+    "q": "Do you provide hosting and maintenance?",
+    "a": "We can set up hosting and offer care plans for updates, security and backups. You keep ownership of your domain and accounts."
+   }
+  ]
+ }
+]

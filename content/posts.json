@@ -1,0 +1,29 @@
+[
+ {
+  "slug": "how-ai-automation-saves-time",
+  "title": "How AI automation saves small businesses 20+ hours a week",
+  "desc": "Practical AI automation examples for lead handling, follow-ups and reporting, plus how to choose your first workflow.",
+  "date": "2026-11-01",
+  "tag": "AI Automation",
+  "service": "ai-automation",
+  "body": "<p>Most small teams lose hours every week to copy-pasting leads, chasing follow-ups and building reports by hand. These tasks are repetitive, rule-based and easy to get wrong, which makes them ideal for automation.</p><h2>Three automations to start with</h2><p><strong>1. Instant lead replies and qualification.</strong> When someone fills in a form, an automated message confirms receipt, asks one or two qualifying questions and routes the lead to the right person.</p><p><strong>2. Automatic CRM updates.</strong> New enquiries, calls and emails are logged without manual entry, so your pipeline is always current.</p><p><strong>3. Weekly reports.</strong> Numbers from your ads, website and CRM are collected and sent to your inbox every Monday.</p><h2>How to choose your first workflow</h2><p>List the tasks your team repeats every week, estimate the time each takes and pick the one with the highest time cost and the clearest steps. Build it simply, measure the time saved and then expand.</p><h2>Keep a human in the loop</h2><p>Use AI for speed but keep a clear handover to a person for anything sensitive. Review conversation logs regularly and improve the workflow.</p><p>If you want help, see our <a href=\"/services/ai-automation\">AI automation services</a> or <a href=\"/contact\">book a free call</a>.</p>"
+ },
+ {
+  "slug": "google-ads-tracking-checklist",
+  "title": "The Google Ads and Meta Pixel tracking checklist",
+  "desc": "Set up Google Tag Manager, GA4, Meta Pixel and conversion events correctly before you spend money on ads.",
+  "date": "2026-10-20",
+  "tag": "Digital Marketing",
+  "service": "digital-marketing",
+  "body": "<p>Incorrect tracking is one of the most common reasons ad budgets are wasted. If your accounts cannot see which clicks become leads, they cannot optimize, and your reports cannot be trusted.</p><h2>The checklist</h2><ul><li>Install Google Tag Manager once and manage every tag inside it.</li><li>Connect GA4 and define key events such as form submissions, calls and bookings.</li><li>Install the Meta Pixel and consider the Conversions API for better accuracy.</li><li>Create conversions in Google Ads and import them from GA4 where useful.</li><li>Add UTM parameters to every campaign link.</li><li>Test every event using preview tools before spending.</li></ul><h2>Consent and privacy</h2><p>For visitors in the UK and EU, tracking should respect cookie choices. Configure Google Consent Mode and load advertising tags only after consent.</p><h2>Review monthly</h2><p>Check that events still fire after website changes and compare platform numbers with your CRM.</p><p>Need a hand? Our <a href=\"/services/digital-marketing\">digital marketing service</a> includes full tracking setup.</p>"
+ },
+ {
+  "slug": "content-marketing-for-lead-generation",
+  "title": "Content marketing for lead generation: a simple plan",
+  "desc": "A practical content marketing plan for service businesses: choose topics, publish consistently and turn readers into enquiries.",
+  "date": "2026-10-05",
+  "tag": "Content",
+  "service": "content",
+  "body": "<p>Content marketing works when it answers real customer questions and makes the next step obvious. You do not need to publish daily. You need a plan you can keep.</p><h2>Step 1: List customer questions</h2><p>Write down the questions prospects ask before they buy, such as costs, timelines, comparisons and common concerns. Each question can become an article.</p><h2>Step 2: Match content to the funnel</h2><p>Mix educational articles for people who are researching, comparison guides for people who are deciding and case-style content for people who are ready to talk.</p><h2>Step 3: Publish consistently</h2><p>Choose a rhythm, such as two articles and several social posts each week, and use a calendar so it does not slip.</p><h2>Step 4: Add a clear call to action</h2><p>End each piece with one next step, such as a call booking or a download. Link to related pages like your <a href=\"/services/web-development\">website</a> and <a href=\"/pricing\">pricing</a>.</p><h2>Step 5: Measure and improve</h2><p>Track which articles produce enquiries and update them regularly. Our <a href=\"/services/content\">content marketing service</a> handles planning, writing and reporting.</p>"
+ }
+]

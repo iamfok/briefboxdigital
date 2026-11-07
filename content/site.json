@@ -1,0 +1,296 @@
+{
+ "brand": "Briefbox Digital",
+ "domain": "https://briefboxdigital.com",
+ "email": "hello@briefboxdigital.com",
+ "tagline": "AI Automation, Digital Marketing, Content & Web Development",
+ "description": "AI automation, digital marketing, content and web development for brands in the USA, UK and Europe. Book a free strategy call with Briefbox Digital.",
+ "logo": {
+  "head": "/assets/logo-h.png",
+  "hw": 560,
+  "hh": 203,
+  "full": "/assets/logo.png",
+  "fw": 720,
+  "fh": 274
+ },
+ "theme": {
+  "bg": "#06031c",
+  "c1": "#6a14f5",
+  "c2": "#ff7a00",
+  "c3": "#a02cf0"
+ },
+ "nav": [
+  {
+   "t": "Services",
+   "u": "/services",
+   "children": [
+    {
+     "t": "AI Automation",
+     "u": "/services/ai-automation"
+    },
+    {
+     "t": "Digital Marketing",
+     "u": "/services/digital-marketing"
+    },
+    {
+     "t": "Content",
+     "u": "/services/content"
+    },
+    {
+     "t": "Web Development",
+     "u": "/services/web-development"
+    }
+   ]
+  },
+  {
+   "t": "Pricing",
+   "u": "/pricing"
+  },
+  {
+   "t": "Blog",
+   "u": "/blog"
+  },
+  {
+   "t": "About",
+   "u": "/about"
+  },
+  {
+   "t": "Contact",
+   "u": "/contact"
+  }
+ ],
+ "cta": "Book a call",
+ "home": {
+  "meta": "AI Automation & Digital Marketing Agency | Briefbox Digital",
+  "tag": "AI-powered digital studio",
+  "title": "AI & digital growth systems that *win customers*",
+  "sub": "AI automation, digital marketing, content and web development, built to turn visitors into customers across the USA, UK and Europe.",
+  "cta1": "Book a free call",
+  "cta2": "Explore services",
+  "ring1": [
+   "AI Automation",
+   "Digital Marketing",
+   "Content"
+  ],
+  "ring2": [
+   "Web Dev",
+   "Analytics"
+  ],
+  "ticker": [
+   "AI Automation",
+   "Digital Marketing",
+   "Content Marketing",
+   "Web Development",
+   "Google & Meta Ads",
+   "Business Growth"
+  ],
+  "svc_title": "Everything you need to *grow online*",
+  "svc_sub": "Four connected services delivered by one accountable team.",
+  "why_title": "Why brands choose *Briefbox Digital*",
+  "why": [
+   {
+    "t": "Measurable by design",
+    "d": "Tracking is configured before any campaign or automation goes live, so results are visible from day one."
+   },
+   {
+    "t": "AI with a human check",
+    "d": "We use AI for speed and people for judgment. Everything customer-facing is reviewed."
+   },
+   {
+    "t": "One team, four disciplines",
+    "d": "Automation, ads, content and web work together instead of living in separate silos."
+   },
+   {
+    "t": "Clear scope and pricing",
+    "d": "Written scopes, published packages and no surprise invoices."
+   }
+  ],
+  "steps_title": "How we *work*",
+  "steps": [
+   {
+    "t": "1. Discover",
+    "d": "A free call to understand your goals, tools and customers."
+   },
+   {
+    "t": "2. Build",
+    "d": "We design, automate and launch with clear milestones and approvals."
+   },
+   {
+    "t": "3. Grow",
+    "d": "We track, test and improve every month with transparent reporting."
+   }
+  ],
+  "ex_title": "Example solutions we *build*",
+  "ex_sub": "Typical projects that show what our services look like in practice.",
+  "examples": [
+   {
+    "t": "AI lead-qualification chatbot",
+    "d": "A website and WhatsApp assistant that answers questions, qualifies enquiries and books calls."
+   },
+   {
+    "t": "Ad tracking and reporting setup",
+    "d": "Google Tag Manager, GA4, Meta Pixel and a live dashboard connected to your ad accounts."
+   },
+   {
+    "t": "Monthly content engine",
+    "d": "A planned mix of articles, social posts and newsletters aligned to your sales cycle."
+   },
+   {
+    "t": "Fast lead-generation website",
+    "d": "A mobile-first site with a blog, tracking and booking built in."
+   }
+  ],
+  "faq_title": "Frequently asked *questions*",
+  "blog_title": "Latest from the *blog*",
+  "cta_title": "Ready to *grow*?",
+  "cta_sub": "Book a free strategy call and get a clear plan within 48 hours."
+ },
+ "book": {
+  "url": ""
+ },
+ "social": [
+  {
+   "n": "LinkedIn",
+   "u": "https://www.linkedin.com/",
+   "i": "in",
+   "c": "#0A66C2"
+  },
+  {
+   "n": "X",
+   "u": "https://x.com/",
+   "i": "X",
+   "c": "#111111"
+  },
+  {
+   "n": "Facebook",
+   "u": "https://www.facebook.com/",
+   "i": "f",
+   "c": "#1877F2"
+  },
+  {
+   "n": "Instagram",
+   "u": "https://www.instagram.com/",
+   "i": "IG",
+   "c": "linear-gradient(45deg,#f09433,#dc2743,#bc1888)"
+  },
+  {
+   "n": "YouTube",
+   "u": "https://www.youtube.com/",
+   "i": "▶",
+   "c": "#FF0000"
+  },
+  {
+   "n": "WhatsApp",
+   "u": "https://wa.me/",
+   "i": "WA",
+   "c": "#25D366"
+  }
+ ],
+ "footer": {
+  "about": "AI automation, digital marketing, content and web development for brands in the USA, UK and Europe.",
+  "copy": "© 2026 Briefbox Digital. All rights reserved.",
+  "cols": [
+   {
+    "title": "Services",
+    "links": [
+     {
+      "t": "All services",
+      "u": "/services"
+     },
+     {
+      "t": "AI Automation",
+      "u": "/services/ai-automation"
+     },
+     {
+      "t": "Digital Marketing",
+      "u": "/services/digital-marketing"
+     },
+     {
+      "t": "Content",
+      "u": "/services/content"
+     },
+     {
+      "t": "Web Development",
+      "u": "/services/web-development"
+     }
+    ]
+   },
+   {
+    "title": "Company",
+    "links": [
+     {
+      "t": "About",
+      "u": "/about"
+     },
+     {
+      "t": "Pricing",
+      "u": "/pricing"
+     },
+     {
+      "t": "Blog",
+      "u": "/blog"
+     },
+     {
+      "t": "Contact",
+      "u": "/contact"
+     }
+    ]
+   },
+   {
+    "title": "Legal",
+    "links": [
+     {
+      "t": "Privacy Policy",
+      "u": "/privacy"
+     },
+     {
+      "t": "Terms of Service",
+      "u": "/terms"
+     },
+     {
+      "t": "Cookie Policy",
+      "u": "/cookies"
+     }
+    ]
+   }
+  ]
+ },
+ "track": {
+  "gtm": "",
+  "ga4": "",
+  "ads": "",
+  "meta": "",
+  "custom": ""
+ },
+ "phone": "",
+ "address": "",
+ "pg": {
+  "hub": {
+   "title": "AI, Marketing & Web Services | Briefbox Digital",
+   "h1": "AI automation, digital marketing, content and web development",
+   "desc": "Explore Briefbox Digital services: AI automation, Google and Meta Ads, content marketing and web development for brands in the USA, UK and Europe.",
+   "intro": "We combine four disciplines so your systems, traffic, content and website all work together. Choose a service to see what is included, how we work and answers to common questions."
+  },
+  "pricing": {
+   "title": "Pricing & Packages | Briefbox Digital",
+   "h1": "Simple pricing for AI, marketing, content and web projects",
+   "desc": "Compare Briefbox Digital packages for AI automation, digital marketing, content and web development. Clear USD prices and what is included in each plan.",
+   "intro": "Every service has three packages so you can start small and scale. Prices are in US dollars and exclude taxes such as VAT or sales tax. Need something different? We provide custom quotes.",
+   "note": "Ad spend, software subscriptions and stock imagery are not included unless stated."
+  },
+  "blog": {
+   "title": "Blog: AI, Marketing & Web Guides | Briefbox Digital",
+   "h1": "The Briefbox blog",
+   "desc": "Practical guides on AI automation, digital marketing, content and web development from the Briefbox Digital team.",
+   "intro": "Practical guides on AI automation, digital marketing, content and web development."
+  },
+  "contact": {
+   "title": "Contact & Book a Call | Briefbox Digital",
+   "h1": "Let’s build your *growth engine*",
+   "desc": "Contact Briefbox Digital or book a free strategy call. Tell us about your project and we will reply within one business day.",
+   "intro": "Book a free call or send us a message. We reply within one business day."
+  }
+ },
+ "forms": {
+  "endpoint": ""
+ }
+}

@@ -1,0 +1,68 @@
+{
+ "home": [
+  {
+   "q": "What does Briefbox Digital do?",
+   "a": "We provide AI automation, digital marketing, content marketing and web development for businesses in the USA, UK and Europe. Our services are designed to work together, so you can start with one and add others as you grow."
+  },
+  {
+   "q": "Which countries do you work in?",
+   "a": "We work remotely with clients in the United States, the United Kingdom and across Europe, and we adapt copy, currency and compliance to each market."
+  },
+  {
+   "q": "How do I get started?",
+   "a": "Book a free strategy call. We discuss your goals and tools, then send a clear plan, scope and price within a few business days."
+  },
+  {
+   "q": "How much do your services cost?",
+   "a": "Each service has three published packages, from one-time audits to monthly retainers. See the pricing page for details, or request a custom quote."
+  },
+  {
+   "q": "Do you guarantee results?",
+   "a": "No agency can honestly guarantee rankings, sales or ad performance. We guarantee clear scopes, accurate tracking and transparent reporting, and we focus on measurable improvements."
+  },
+  {
+   "q": "Do I own my accounts and assets?",
+   "a": "Yes. Your ad accounts, analytics, domains and final deliverables belong to you, and we work inside accounts you control."
+  }
+ ],
+ "blog": [
+  {
+   "q": "How often do you publish new articles?",
+   "a": "We publish practical guides regularly. Subscribe by following us on social media or contact us to suggest a topic."
+  },
+  {
+   "q": "Can I request an article topic?",
+   "a": "Yes. Send your question through the contact page and we may turn it into a guide."
+  },
+  {
+   "q": "Are your guides suitable for beginners?",
+   "a": "Yes. We explain concepts in plain language and link to related services when you need hands-on help."
+  },
+  {
+   "q": "Can I republish your content?",
+   "a": "Please contact us first. We are happy to discuss guest posts and partnerships."
+  }
+ ],
+ "pricing": [
+  {
+   "q": "Are prices in US dollars?",
+   "a": "Yes. Prices are shown in USD and exclude taxes such as VAT or sales tax, which are added at checkout or on your invoice where required."
+  },
+  {
+   "q": "Is ad spend included in marketing packages?",
+   "a": "No. Ad budgets are paid directly to Google, Meta or other platforms. Our fee covers strategy, setup, management and reporting."
+  },
+  {
+   "q": "Can I upgrade or cancel a monthly package?",
+   "a": "You can upgrade at any time. Monthly packages can be cancelled with 30 days notice, as detailed in your proposal."
+  },
+  {
+   "q": "Do you offer custom quotes?",
+   "a": "Yes. If your project does not fit a package, contact us and we will prepare a tailored proposal."
+  },
+  {
+   "q": "How do I pay?",
+   "a": "We send an invoice or secure payment link after you confirm your package. Payment methods are listed in your proposal."
+  }
+ ]
+}
