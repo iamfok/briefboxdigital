@@ -1,4 +1,4 @@
-(()=>{const rm=matchMedia('(prefers-reduced-motion:reduce)').matches,B=window.BB||{},d=document,L=localStorage;window.dataLayer=window.dataLayer||[];
+(()=>{const rm=false,B=window.BB||{},d=document,L=localStorage;window.dataLayer=window.dataLayer||[];
 function gtag(){dataLayer.push(arguments)}window.gtag=gtag;
 gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied'});
 const ld=u=>{const s=d.createElement('script');s.async=1;s.src=u;d.head.appendChild(s)};let loaded=0;
