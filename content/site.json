@@ -142,7 +142,8 @@
   "faq_title": "Frequently asked *questions*",
   "blog_title": "Latest from the *blog*",
   "cta_title": "Ready to *grow*?",
-  "cta_sub": "Book a free strategy call and get a clear plan within 48 hours."
+  "cta_sub": "Book a free strategy call and get a clear plan within 48 hours.",
+  "cover": ""
  },
  "book": {
   "url": ""
@@ -261,36 +262,41 @@
   "meta": "",
   "custom": ""
  },
- "phone": "",
- "address": "",
+ "phone": "+8801723579924",
+ "address": "Dhanmondi",
  "pg": {
   "hub": {
    "title": "AI, Marketing & Web Services | Briefbox Digital",
    "h1": "AI automation, digital marketing, content and web development",
    "desc": "Explore Briefbox Digital services: AI automation, Google and Meta Ads, content marketing and web development for brands in the USA, UK and Europe.",
-   "intro": "We combine four disciplines so your systems, traffic, content and website all work together. Choose a service to see what is included, how we work and answers to common questions."
+   "intro": "We combine four disciplines so your systems, traffic, content and website all work together. Choose a service to see what is included, how we work and answers to common questions.",
+   "cover": ""
   },
   "pricing": {
    "title": "Pricing & Packages | Briefbox Digital",
    "h1": "Simple pricing for AI, marketing, content and web projects",
    "desc": "Compare Briefbox Digital packages for AI automation, digital marketing, content and web development. Clear USD prices and what is included in each plan.",
    "intro": "Every service has three packages so you can start small and scale. Prices are in US dollars and exclude taxes such as VAT or sales tax. Need something different? We provide custom quotes.",
-   "note": "Ad spend, software subscriptions and stock imagery are not included unless stated."
+   "note": "Ad spend, software subscriptions and stock imagery are not included unless stated.",
+   "cover": ""
   },
   "blog": {
    "title": "Blog: AI, Marketing & Web Guides | Briefbox Digital",
    "h1": "The Briefbox blog",
    "desc": "Practical guides on AI automation, digital marketing, content and web development from the Briefbox Digital team.",
-   "intro": "Practical guides on AI automation, digital marketing, content and web development."
+   "intro": "Practical guides on AI automation, digital marketing, content and web development.",
+   "cover": ""
   },
   "contact": {
    "title": "Contact & Book a Call | Briefbox Digital",
    "h1": "Let’s build your *growth engine*",
    "desc": "Contact Briefbox Digital or book a free strategy call. Tell us about your project and we will reply within one business day.",
-   "intro": "Book a free call or send us a message. We reply within one business day."
+   "intro": "Book a free call or send us a message. We reply within one business day.",
+   "cover": ""
   }
  },
  "forms": {
   "endpoint": ""
- }
+ },
+ "cover": ""
 }
