@@ -16,7 +16,7 @@ d.addEventListener('click',e=>{const t=e.target;
 const pl=new URLSearchParams(location.search).get('plan'),cf=d.getElementById('cf');if(pl&&cf)cf.elements.message.value='I am interested in: '+pl;
 d.querySelectorAll('[data-today]').forEach(i=>i.min=new Date().toISOString().slice(0,10));
 d.querySelectorAll('[data-slots]').forEach(b=>{const h=b.parentNode.querySelector('input[name=time]');for(let t=9;t<=17;t++){const x=document.createElement('button'),v=(t<10?'0':'')+t+':00';x.type='button';x.textContent=v;x.onclick=()=>{b.querySelectorAll('button').forEach(y=>y.classList.remove('on'));x.classList.add('on');h.value=v};b.append(x)}});
-d.querySelectorAll('form[data-form]').forEach(f=>f.addEventListener('submit',async e=>{e.preventDefault();if(f.elements.time&&!f.elements.time.value)return alert('Please choose a time');const fd=new FormData(f),ep=f.getAttribute('action');ev('generate_lead',f.dataset.kind);
+d.querySelectorAll('form[data-form]').forEach(f=>f.addEventListener('submit',async e=>{e.preventDefault();if(f.elements.time&&!f.elements.time.value)return alert('Please choose a time');const fd=new FormData(f),ep=f.getAttribute('action');if(fd.get('_gotcha'))return;ev('generate_lead',f.dataset.kind);
  if(ep){try{const r=await fetch(ep,{method:'POST',body:fd,headers:{Accept:'application/json'}});if(!r.ok)throw 0;f.innerHTML='<h3>Thank you!</h3><p class="mu">We received your request and will reply within one business day.</p>';return}catch(_){}}
  const lines=[...fd.entries()].filter(([k])=>k[0]!=='_').map(([k,v])=>k+': '+v).join('\n');location.href='mailto:'+f.dataset.mail+'?subject='+encodeURIComponent(f.dataset.kind+' from '+fd.get('name'))+'&body='+encodeURIComponent(lines)}));
 /* hero: network background + movable orbit */
