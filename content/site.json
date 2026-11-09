@@ -151,39 +151,21 @@
  "social": [
   {
    "n": "LinkedIn",
-   "u": "https://www.linkedin.com/",
+   "u": "https://www.linkedin.com/company/briefboxdigital",
    "i": "in",
    "c": "#0A66C2"
   },
   {
-   "n": "X",
-   "u": "https://x.com/",
-   "i": "X",
-   "c": "#111111"
-  },
-  {
    "n": "Facebook",
-   "u": "https://www.facebook.com/",
+   "u": "https://www.facebook.com/briefboxdigitalai",
    "i": "f",
    "c": "#1877F2"
   },
   {
    "n": "Instagram",
-   "u": "https://www.instagram.com/",
+   "u": "https://www.instagram.com//briefboxdigitalai",
    "i": "IG",
    "c": "linear-gradient(45deg,#f09433,#dc2743,#bc1888)"
-  },
-  {
-   "n": "YouTube",
-   "u": "https://www.youtube.com/",
-   "i": "▶",
-   "c": "#FF0000"
-  },
-  {
-   "n": "WhatsApp",
-   "u": "https://wa.me/",
-   "i": "WA",
-   "c": "#25D366"
   }
  ],
  "footer": {
