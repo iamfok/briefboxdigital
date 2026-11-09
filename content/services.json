@@ -10,8 +10,8 @@
    {
     "name": "Automation Audit",
     "desc": "Find the fastest wins.",
-    "price": "$490",
-    "per": " one-time",
+    "price": "$20",
+    "per": "/month",
     "pop": false,
     "pay": "",
     "features": [
@@ -24,8 +24,8 @@
    {
     "name": "Workflow Build",
     "desc": "Launch your first automations.",
-    "price": "$1,990",
-    "per": " one-time",
+    "price": "$190",
+    "per": "/month",
     "pop": true,
     "pay": "",
     "features": [
@@ -39,7 +39,7 @@
    {
     "name": "AI Partner",
     "desc": "Ongoing AI growth partner.",
-    "price": "$3,900",
+    "price": "$999",
     "per": "/month",
     "pop": false,
     "pay": "",
