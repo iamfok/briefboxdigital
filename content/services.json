@@ -153,7 +153,7 @@
    {
     "name": "Launch",
     "desc": "One platform, done properly.",
-    "price": "$790",
+    "price": "$299",
     "per": "/month",
     "pop": false,
     "pay": "",
@@ -167,7 +167,7 @@
    {
     "name": "Growth",
     "desc": "Scale across both platforms.",
-    "price": "$1,590",
+    "price": "$399",
     "per": "/month",
     "pop": true,
     "pay": "",
@@ -182,7 +182,7 @@
    {
     "name": "Scale",
     "desc": "Full-funnel performance.",
-    "price": "$2,990",
+    "price": "$990",
     "per": "/month",
     "pop": false,
     "pay": "",
