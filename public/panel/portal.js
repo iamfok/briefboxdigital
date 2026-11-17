@@ -35,7 +35,7 @@ function renderAuth(mode) {
   const reg = mode === 'register';
   app.innerHTML = `<div class="auth">
     <aside class="auth-side">
-      <a class="wordmark" href="/">Briefbox <span>Digital</span></a>
+      <a class="wordmark" href="/"><img src="/assets/logo-h.png" alt="Briefbox Digital" height="34"></a>
       <div class="auth-copy"><h1>Every lead answered, checked and handed to the right counsellor.</h1>
         <p>This is where you connect your WhatsApp, CRM and email, follow every lead, and manage your plan.</p></div>
       <ol class="auth-steps">
@@ -78,7 +78,7 @@ function shell(tab) {
   const a = state.me.account, plan = state.me.plan;
   const tabs = [['info', 'Info'], ['settings', 'Settings'], ['dashboard', 'Dashboard'], ['subscription', 'Subscription']];
   app.innerHTML = `
-  <header class="topbar"><a class="wordmark" href="#/">Briefbox <span>Digital</span></a>
+  <header class="topbar"><a class="wordmark" href="#/"><img src="/assets/logo-h.png" alt="Briefbox Digital" height="34"></a>
     <div class="topbar-r"><span class="who">${esc(a.email)}</span><button class="btn ghost-inv small" id="logout">Sign out</button></div></header>
   <div class="page">
     <div class="profilehead">
