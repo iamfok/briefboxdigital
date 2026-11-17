@@ -1,0 +1,18 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // Must match the Worker name in the Cloudflare dashboard.
+  "name": "briefboxdigital",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2025-09-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
+  // Keeps variables you add in the Cloudflare dashboard when GitHub deploys again.
+  "keep_vars": true,
+  "observability": { "enabled": true }
+
+  // DATABASE (later): create a D1 database named "briefbox", then remove the two slashes
+  // in front of the 3 lines below and paste its database_id. Tables are created automatically.
+  // ,"d1_databases": [
+  //   { "binding": "DB", "database_name": "briefbox", "database_id": "PASTE-DATABASE-ID-HERE" }
+  // ]
+}
