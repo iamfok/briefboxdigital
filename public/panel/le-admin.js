@@ -337,7 +337,8 @@ async function renderConnection() {
   };
   $('#testC').onclick = e => busy(e.target, async () => {
     const out = $('#ctest');
-    try { const r = await api('/connection/test', { method: 'POST', body: {} }); out.textContent = r.message; out.className = r.ok ? 'small' : 'error'; }
+    try { await api('/connection', { method: 'PUT', body: Object.fromEntries(new FormData($('#nf'))) });
+      const r = await api('/connection/test', { method: 'POST', body: {} }); out.textContent = r.message; out.className = r.ok ? 'small' : 'error'; }
     catch (err) { out.textContent = err.message; out.className = 'error'; }
   });
 }
