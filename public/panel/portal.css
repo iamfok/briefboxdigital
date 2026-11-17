@@ -340,3 +340,30 @@ dialog h2 { margin-bottom: 12px; }
 table.t code { white-space: nowrap; }
 input[type=text], input[type=password], input[type=email], input[type=number], input[type=url], input[type=date], select { height: 42px; }
 #tab > .section:first-child, #tab > #missing + form > .section:first-child { border-top: 0; }
+
+/* brand look: logo, glows and gradient like the main website */
+.wordmark img { display: block; height: 34px; width: auto; }
+.pp { min-height: 100vh;
+  background:
+    radial-gradient(900px 520px at 8% -8%, color-mix(in srgb, #6a14f5 14%, transparent), transparent 62%),
+    radial-gradient(760px 460px at 100% 4%, color-mix(in srgb, #ff7a00 10%, transparent), transparent 60%),
+    radial-gradient(700px 500px at 50% 110%, color-mix(in srgb, #a02cf0 8%, transparent), transparent 60%),
+    var(--paper);
+  background-attachment: fixed; }
+@media (prefers-color-scheme: dark) {
+  .pp { background:
+    radial-gradient(900px 520px at 8% -8%, rgba(106,20,245,.32), transparent 62%),
+    radial-gradient(760px 460px at 100% 4%, rgba(255,122,0,.16), transparent 60%),
+    radial-gradient(700px 500px at 50% 110%, rgba(160,44,240,.18), transparent 60%),
+    #06031c; background-attachment: fixed; }
+  .pp .track, .pp .plan, .pp .plan-now, .pp .paybox, .pp .panel, .pp .kpis, .pp .board { background: rgba(21,19,46,.72); backdrop-filter: blur(8px); }
+}
+.pp .topbar { background: rgba(6,3,28,.86); backdrop-filter: blur(10px); border-bottom: 1px solid transparent;
+  border-image: linear-gradient(90deg, #6a14f5, #ff7a00) 1; }
+.pp .auth-side { background:
+    radial-gradient(600px 380px at 0% 0%, rgba(106,20,245,.45), transparent 60%),
+    radial-gradient(520px 360px at 100% 100%, rgba(255,122,0,.22), transparent 60%), #06031c; }
+.pp .btn.primary { background: linear-gradient(90deg, #6a14f5, #ff7a00); border-color: transparent; color: #fff; }
+.pp .btn.primary:hover { filter: brightness(1.08); background: linear-gradient(90deg, #6a14f5, #ff7a00); }
+.pp .track li[data-state=current] .stop { border-color: #6a14f5; color: #6a14f5; }
+@media (prefers-color-scheme: dark) { .pp .track li[data-state=current] .stop { border-color: #a78bfa; color: #c4b5fd; } }
