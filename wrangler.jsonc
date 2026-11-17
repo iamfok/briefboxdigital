@@ -12,7 +12,7 @@
 
   // DATABASE (later): create a D1 database named "briefbox", then remove the two slashes
   // in front of the 3 lines below and paste its database_id. Tables are created automatically.
-  // ,"d1_databases": [
-  //   { "binding": "DB", "database_name": "briefbox", "database_id": "PASTE-DATABASE-ID-HERE" }
-  // ]
+   ,"d1_databases": [
+     { "binding": "DB", "database_name": "briefbox", "database_id": "e46ebf78-434d-4077-b29c-425b732f1cd8" }
+   ]
 }
