@@ -30,7 +30,7 @@ const V = [
   { id: 'le-overview', t: 'Overview', i: 'bolt', need: 'owner', le: 1 },
   { id: 'le-clients', t: 'Clients', i: 'users', need: 'owner', le: 1 },
   { id: 'le-payments', t: 'Payments', i: 'card', need: 'owner', le: 1 },
-  { id: 'le-plans', t: 'Plans', i: 'layers', need: 'owner', le: 1 },
+  { id: 'le-products', t: 'Products', i: 'layers', need: 'owner', le: 1 },
   { id: 'le-billing', t: 'Billing settings', i: 'tag', need: 'owner', le: 1 },
   { id: 'le-connection', t: 'n8n connection', i: 'plug', need: 'owner', le: 1 },
   { id: 'integ', t: 'Tracking & Booking', i: 'plug', f: 'site', k: ['track', 'book', 'forms'] },
@@ -38,9 +38,9 @@ const V = [
   { id: 'team', t: 'Users & Access', i: 'cog' },
 ];
 // hidden routes inside Lead Engine
-const HIDDEN = { 'le-a': 'le-clients', 'le-new': 'le-clients' };
+const HIDDEN = { 'le-a': 'le-clients', 'le-s': 'le-clients', 'le-new': 'le-clients', 'le-product': 'le-products', 'le-plans': 'le-products' };
 const GR = [['Overview', ['dash', 'inbox']], ['Website', ['home', 'menus', 'seo', 'pgs']], ['Content', ['services', 'pricing', 'pages', 'posts', 'faqs', 'media']],
-  ['Lead Engine', ['le-overview', 'le-clients', 'le-payments', 'le-plans', 'le-billing', 'le-connection']], ['System', ['integ', 'history', 'team']]];
+  ['Automations', ['le-overview', 'le-clients', 'le-payments', 'le-products', 'le-billing', 'le-connection']], ['System', ['integ', 'history', 'team']]];
 const allowed = v => !v.need || (v.need === 'owner' ? me.role === 'owner' : me.role !== 'viewer');
 const canEdit = () => me.role === 'owner' || me.role === 'editor';
 
