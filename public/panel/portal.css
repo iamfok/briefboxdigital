@@ -367,3 +367,16 @@ input[type=text], input[type=password], input[type=email], input[type=number], i
 .pp .btn.primary:hover { filter: brightness(1.08); background: linear-gradient(90deg, #6a14f5, #ff7a00); }
 .pp .track li[data-state=current] .stop { border-color: #6a14f5; color: #6a14f5; }
 @media (prefers-color-scheme: dark) { .pp .track li[data-state=current] .stop { border-color: #a78bfa; color: #c4b5fd; } }
+
+/* my automations */
+.autos { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px; margin-bottom: 26px; }
+.auto { display: grid; grid-template-columns: 44px 1fr auto; gap: 14px; align-items: center; padding: 16px 18px; border: 1px solid var(--line); border-radius: var(--radius-m);
+  background: var(--panel); color: var(--ink); text-decoration: none; }
+.auto:hover { border-color: var(--ink-3); }
+.auto-ic { font-size: 26px; line-height: 1; text-align: center; }
+.auto-body { display: grid; gap: 2px; min-width: 0; }
+.autohead { margin: 4px 0 16px; display: grid; gap: 6px; }
+.autohead h2 { font-size: 24px; }
+.autohead .sub { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; color: var(--ink-2); font-size: 14px; }
+.subtabs { margin-top: 0; }
+@media (prefers-color-scheme: dark) { .pp .auto { background: rgba(21,19,46,.72); } }
