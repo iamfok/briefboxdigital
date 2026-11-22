@@ -335,6 +335,106 @@ const subPill = st => statusPill(...(SUB[st] || [st, '']));
 const STAGE = { review: ['Setting up', 'info'], live: ['Live', 'good'], expired: ['Expired', 'bad'], suspended: ['Paused by Briefbox', 'warn'], rejected: ['Not approved', 'bad'] };
 const stagePill = st => statusPill(...(STAGE[st] || [st, '']));
 
-window.UI = { $, $$, esc, toast, makeApi, fmtDate, fmtDateTime, money, periodLabel, busy, field, area, choices, statusPill, settingsForm, dashboard,
+
+// ------------------------------------------------------------------ generic automation form (built from the product's fields)
+function genInput(f, v, name) {
+  const n = esc(name || f.key), ph = esc(f.placeholder || '');
+  if (f.type === 'textarea') return `<textarea name="${n}" placeholder="${ph}">${esc(v)}</textarea>`;
+  if (f.type === 'select') return `<select name="${n}">${(f.options || []).map(o => `<option value="${esc(o.value)}" ${String(v) === String(o.value) ? 'selected' : ''}>${esc(o.label)}</option>`).join('')}</select>`;
+  if (f.type === 'toggle') return `<input type="checkbox" name="${n}" ${v ? 'checked' : ''}>`;
+  const type = { secret: 'password', number: 'number', url: 'url', email: 'email' }[f.type] || 'text';
+  return `<input type="${type}" name="${n}" value="${esc(v)}" placeholder="${ph}" ${f.type === 'secret' ? 'autocomplete="off"' : ''} ${f.type === 'number' ? 'step="any"' : ''}>`;
+}
+function genField(f, v) {
+  const when = f.show_if ? ` data-when="${esc(f.show_if)}"` : '';
+  const help = f.help ? `<small class="muted small">${esc(f.help)}</small>` : '';
+  const req = f.required ? ' <span class="hint">required</span>' : '';
+  if (f.type === 'toggle') return `<div class="stack" style="gap:4px"${when}><label class="switch">${genInput(f, v)} <span>${esc(f.label)}</span></label>${help}</div>`;
+  if (f.type === 'list') {
+    const cols = f.fields, rows = Array.isArray(v) && v.length ? v : [{}];
+    const grid = `grid-template-columns:repeat(${cols.length},1fr) 36px`;
+    const row = r => `<div class="team-row" style="${grid}">${cols.map(c => c.type === 'toggle' ? `<label class="switch">${genInput(c, r[c.key], '')}<span class="sr">${esc(c.label)}</span></label>` : genInput(c, r[c.key] ?? '', '').replace('<input', `<input aria-label="${esc(c.label)}" data-k="${esc(c.key)}"`).replace('<select', `<select aria-label="${esc(c.label)}" data-k="${esc(c.key)}"`).replace('<textarea', `<textarea data-k="${esc(c.key)}"`)).join('')}<button type="button" class="icon-btn" data-remove aria-label="Remove row">&times;</button></div>`;
+    return `<div class="stack" style="gap:8px" data-list="${esc(f.key)}"${when}><span class="lab" style="font-size:13px;font-weight:600;color:var(--ink-2)">${esc(f.label)}${req}</span>${help}
+      <div class="team-row team-head" style="${grid}">${cols.map(c => `<span>${esc(c.label)}</span>`).join('')}<span></span></div>
+      <div class="stack rows" style="gap:8px">${rows.map(row).join('')}</div><template>${row({})}</template>
+      <div><button type="button" class="btn small" data-addrow>Add row</button></div></div>`;
+  }
+  return `<label class="field"${when}><span class="lab">${esc(f.label)}${req}</span>${genInput(f, v ?? '')}${help}</label>`;
+}
+function genericForm(el, view, { save }) {
+  const s = view.settings || {}, fields = view.fields || [];
+  const groups = [];
+  for (const f of fields) { const g = f.group || 'Settings'; let x = groups.find(y => y.name === g); if (!x) groups.push(x = { name: g, fields: [] }); x.fields.push(f); }
+  el.innerHTML = `<div id="missing">${missingBox(view.missing, view.live)}</div>
+  <form id="gf" novalidate>
+    ${view.live ? `<section class="section"><header><h2>Automation</h2><p>Pause it any time.</p></header>
+      <div><label class="switch"><input type="checkbox" name="active" ${s.active !== false ? 'checked' : ''}> <span>Automation on</span></label></div></section>` : ''}
+    ${groups.map(g => `<section class="section"><header><h2>${esc(g.name)}</h2></header><div class="stack">${g.fields.map(f => genField(f, s[f.key])).join('')}</div></section>`).join('')
+      || '<p class="muted">This automation needs no settings. Choose a plan on the Subscription tab.</p>'}
+    ${view.webhooks && view.webhooks.length ? `<section class="section"><header><h2>Your addresses</h2><p>Use these where the setup guide asks for a webhook URL.</p></header>
+      <div class="urls">${view.webhooks.map(h => `<div class="url"><span class="muted">${esc(h.name)}</span><code title="${esc(h.url)}">${esc(h.url)}</code><button type="button" class="btn small" data-copy="${esc(h.url)}">Copy</button></div>`).join('')}</div></section>` : ''}
+    ${fields.length || view.live ? '<div class="savebar"><div class="error" id="formErr" role="alert"></div><button class="btn primary" type="submit">Save settings</button></div>' : ''}
+  </form>`;
+  const form = $('#gf', el);
+  bindCopy(el);
+  const sync = () => $$('[data-when]', form).forEach(x => {
+    const [k, v] = x.dataset.when.split('=');
+    const inp = form.querySelector(`[name="${CSS.escape(k.trim())}"]`);
+    const val = inp ? (inp.type === 'checkbox' ? inp.checked : inp.value) : '';
+    x.hidden = v === undefined ? !val : !v.split('|').map(t => t.trim()).includes(String(val));
+  });
+  form.addEventListener('change', sync); form.addEventListener('input', sync); sync();
+  $$('[data-list]', form).forEach(box => {
+    box.addEventListener('click', e => {
+      if (e.target.matches('[data-addrow]')) $('.rows', box).insertAdjacentHTML('beforeend', $('template', box).innerHTML);
+      if (e.target.matches('[data-remove]')) e.target.closest('.team-row').remove();
+    });
+  });
+  form.onsubmit = async e => {
+    e.preventDefault(); const btn = $('button[type=submit]', form); $('#formErr', form).textContent = '';
+    const o = {};
+    if (form.elements.active) o.active = form.elements.active.checked;
+    for (const f of fields) {
+      if (f.type === 'list') { o[f.key] = $$(`[data-list="${CSS.escape(f.key)}"] .rows .team-row`, form).map(r => Object.fromEntries(f.fields.map(c => { const i = $(`[data-k="${CSS.escape(c.key)}"]`, r) || $('input[type=checkbox]', r); return [c.key, i ? (i.type === 'checkbox' ? i.checked : i.value) : '']; }))); continue; }
+      const i = form.elements[f.key]; if (!i) continue;
+      o[f.key] = i.type === 'checkbox' ? i.checked : i.value;
+    }
+    await busy(btn, async () => {
+      try { const r = await save(o); $('#missing', el).innerHTML = missingBox(r.missing, r.live); toast(r.pushError ? 'Saved, but: ' + r.pushError : r.live ? 'Saved. Your automation uses the new settings now.' : 'Saved'); }
+      catch (err) { $('#formErr', form).textContent = err.errors ? err.errors.join('\n') : err.message; }
+    });
+  };
+}
+
+// ------------------------------------------------------------------ generic automation dashboard
+async function genericDashboard(el, opts, days = 30) {
+  el.innerHTML = '<p class="muted">Loading your numbers...</p>';
+  let d; try { d = await opts.load(days); } catch (e) { el.innerHTML = `<p class="error">${esc(e.message)}</p>`; return; }
+  if (d.empty) {
+    el.innerHTML = d.reason === 'not_live' ? opts.notLive : d.reason === 'no_dashboard'
+      ? '<div class="blank"><h2>Reports are on the way</h2><p>This automation does not have a dashboard yet.</p></div>'
+      : '<div class="blank"><h2>No data yet</h2><p>Numbers appear here after the automation runs for the first time.</p></div>';
+    return;
+  }
+  const t = d.totals, change = t.previous ? Math.round((t.range - t.previous) / t.previous * 100) : null;
+  el.innerHTML = `
+    <div class="dashbar"><div class="range" role="group" aria-label="Date range">${[7, 30, 90].map(n => `<button type="button" data-days="${n}" aria-pressed="${n === d.days}">${n} days</button>`).join('')}</div>
+      <a class="btn small" href="${esc(opts.csvHref(d.days))}" download>Download data (CSV)</a></div>
+    <div class="kpis" style="grid-template-columns:repeat(4,1fr)">
+      ${kpi(t.range, d.kpi_label, `last ${d.days} days`)}${kpi(t.today, 'Today', esc(d.unit))}
+      ${kpi(change == null ? '-' : (change > 0 ? '+' : '') + change + '%', 'Change', `vs the ${d.days} days before`)}${kpi(t.all, 'All time', esc(d.unit))}
+    </div>
+    <div class="panels viz-root">
+      <section class="panel wide"><h2>${esc(d.kpi_label)} per day</h2><p class="cap">Every record the automation saved in this period.</p><div class="chart" id="gPerDay"></div></section>
+      ${d.groups.map(g => `<section class="panel"><h2>By ${esc(g.label.toLowerCase())}</h2><p class="cap">Records from this period.</p>${hbars(Object.entries(g.counts).sort((a, b) => b[1] - a[1]).slice(0, 8))}</section>`).join('')}
+      <section class="panel wide"><h2>Latest</h2><p class="cap">The 15 most recent records.</p>
+        ${d.recent.length ? `<div class="scroll"><table class="t"><tr>${d.columns.map(c => `<th>${esc(c.label)}</th>`).join('')}</tr>
+          ${d.recent.map(r => `<tr>${d.columns.map(c => `<td>${esc(typeof r[c.key] === 'object' ? JSON.stringify(r[c.key]) : r[c.key])}</td>`).join('')}</tr>`).join('')}</table></div>` : '<p class="muted small">Nothing yet.</p>'}</section>
+    </div>`;
+  $$('[data-days]', el).forEach(b => b.onclick = () => genericDashboard(el, opts, Number(b.dataset.days)));
+  columnChart($('#gPerDay', el), d.per_day.map(x => ({ label: x.day.slice(5), full: x.day, value: x.value })), { unit: d.unit.replace(/s$/, ''), height: 220 });
+}
+
+window.UI = { $, $$, esc, toast, makeApi, fmtDate, fmtDateTime, money, periodLabel, busy, field, area, choices, statusPill, settingsForm, dashboard, genericForm, genericDashboard,
   infoFields, invPill, subPill, stagePill, crmLabel, bindCopy };
 })();
