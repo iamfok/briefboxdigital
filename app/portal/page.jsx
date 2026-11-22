@@ -2,7 +2,7 @@
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Client portal | Briefbox Digital', robots: 'noindex,nofollow', icons: { icon: '/assets/mark.png' } };
 
-const V = '20261118';
+const V = '20261118b';
 export default function Portal() {
   return (
     <>
