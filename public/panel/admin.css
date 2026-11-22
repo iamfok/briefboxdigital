@@ -44,3 +44,8 @@ details.msg.unread>summary span{font-weight:700}details.msg.unread>summary::befo
 dialog{border:1px solid var(--bd);border-radius:12px;padding:22px;max-width:460px}dialog::backdrop{background:rgba(0,0,0,.4)}
 .in .pagehead h1{font-size:22px}.in .section{grid-template-columns:200px 1fr}.in .kpis{background:#fff}
 @media(max-width:900px){.g2,.g3{grid-template-columns:1fr}.in .section{grid-template-columns:1fr}}
+
+.chipline{display:inline-flex;gap:6px;align-items:center;margin:2px 10px 2px 0;white-space:nowrap}
+.fieldrow{border:1px solid var(--bd);border-radius:10px;padding:14px;background:#fff;display:grid;gap:10px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;align-items:end}.grid4 .field{margin:0}
+@media(max-width:900px){.grid4{grid-template-columns:1fr 1fr}}
