@@ -459,6 +459,41 @@ async function renderBilling() {
     await busy($('#cf button[type=submit]'), async () => { try { await api('/billing', { method: 'PUT', body: Object.fromEntries(new FormData(e.target)) }); toast('Billing settings saved'); } catch (err) { toast(err.message); } });
   };
   $('#runExp').onclick = e => busy(e.target, async () => { try { const r = await api('/cron/expire', { method: 'POST', body: {} }); toast(`Checked ${r.checked} plans, ${r.changed} changed`); } catch (err) { toast(err.message); } });
+  renderMail();
+}
+
+// Emails: order confirmation with invoice, payment received, receipt, automation approved, welcome.
+async function renderMail() {
+  const box = document.createElement('div'); W0.append(box);
+  let m; try { m = await api('/mail'); } catch (e) { box.innerHTML = errBox(e); return; }
+  const draw = () => {
+    box.innerHTML = `<form id="mf">
+      <section class="section"><header><h2>Emails to clients</h2><p>Sent automatically: order confirmation with the invoice, payment received, receipt, automation approved and welcome. You get a copy of new orders, payments and sign-ups.</p></header>
+        <div class="stack">
+          <label class="field"><span class="lab">Send emails with</span><select name="provider">
+            <option value="" ${!m.provider ? 'selected' : ''}>Off</option><option value="resend" ${m.provider === 'resend' ? 'selected' : ''}>Resend (recommended, free up to 3,000 emails a month)</option>
+            <option value="n8n" ${m.provider === 'n8n' ? 'selected' : ''}>My n8n workflow (Gmail or SMTP node)</option></select></label>
+          <div class="grid2">${field('From', 'from', m.from, { hint: 'e.g. Briefbox Digital &lt;billing@briefboxdigital.com&gt;. For Resend, verify your domain first' })}
+            ${field('Reply-to', 'reply_to', m.reply_to, { hint: 'where client replies go, e.g. hello@briefboxdigital.com' })}</div>
+          <div class="grid2">${field('Your email for copies', 'admin', m.admin, { hint: 'new orders, payments to check, sign-ups. Comma separated' })}
+            <div data-p="resend">${field('Resend API key', 'api_key', m.api_key, { type: 'password', hint: 'resend.com → API Keys. Stored encrypted', attrs: 'autocomplete="off"' })}</div>
+            <div data-p="n8n">${field('n8n webhook URL', 'webhook', m.webhook, { hint: 'Webhook node (POST). It receives to, subject, html, text' })}</div></div>
+        </div></section>
+      <div class="savebar" style="position:static"><span class="error" id="mErr" role="alert"></span><button class="btn" type="button" id="mTest">Send test email</button><button class="btn primary" type="submit">Save email settings</button></div></form>
+      <section class="section"><header><h2>Recent emails</h2><p>The last 30 emails and whether they were sent.</p></header>
+        ${m.log.length ? `<div class="scroll"><table class="t"><tr><th>When</th><th>To</th><th>Subject</th><th>Status</th></tr>${m.log.map(x => `<tr><td>${fmtDateTime(x.created_at)}</td><td>${esc(x.to_addr)}</td><td>${esc(x.subject)}</td>
+          <td>${x.status === 'sent' ? '<span class="pill good">sent</span>' : `<span class="pill bad">failed</span><div class="muted small">${esc(x.error)}</div>`}</td></tr>`).join('')}</table></div>` : '<p class="muted">No emails yet.</p>'}</section>`;
+    const f = $('#mf'), sel = f.elements.provider, show = () => $$('[data-p]', f).forEach(x => { x.hidden = x.dataset.p !== sel.value; });
+    sel.onchange = show; show();
+    const save = async () => { m = await api('/mail', { method: 'PUT', body: Object.fromEntries(new FormData(f)) }); };
+    f.onsubmit = async e => { e.preventDefault(); $('#mErr').textContent = ''; await busy($('#mf button[type=submit]'), async () => { try { await save(); toast('Email settings saved'); draw(); } catch (err) { $('#mErr').textContent = err.message; } }); };
+    $('#mTest').onclick = e => busy(e.target, async () => {
+      $('#mErr').textContent = '';
+      try { await save(); const to = prompt('Send a test email to:', m.admin.split(',')[0] || ''); if (!to) return; m = await api('/mail/test', { method: 'POST', body: { to } }); toast('Test email sent to ' + to); draw(); }
+      catch (err) { $('#mErr').textContent = err.message; try { m = await api('/mail'); } catch (x) {} }
+    });
+  };
+  draw();
 }
 
 // ------------------------------------------------------------------ n8n connection

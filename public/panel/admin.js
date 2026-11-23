@@ -19,7 +19,7 @@ const V = [
   { id: 'inbox', t: 'Inbox', i: 'inbox', need: 'inbox' },
   { id: 'home', t: 'Homepage', i: 'home', f: 'site', k: ['home'] },
   { id: 'menus', t: 'Header & Footer', i: 'nav', f: 'site', k: ['nav', 'cta', 'footer', 'social'] },
-  { id: 'seo', t: 'SEO & Branding', i: 'seo', f: 'site', k: ['brand', 'domain', 'email', 'phone', 'address', 'tagline', 'description', 'theme', 'cover'] },
+  { id: 'seo', t: 'SEO & Branding', i: 'seo', f: 'site', k: ['brand', 'domain', 'email', 'phone', 'address', 'city', 'country', 'tagline', 'description', 'theme', 'cover', 'cover_alt'] },
   { id: 'pgs', t: 'Page Texts', i: 'file', f: 'site', k: ['pg'] },
   { id: 'services', t: 'Services', i: 'svc', f: 'services', list: 1, omit: ['tiers', 'from'] },
   { id: 'pricing', t: 'Pricing', i: 'tag', f: 'services', list: 1, only: ['from', 'tiers'] },
@@ -244,16 +244,34 @@ async function inbox(w) {
 }
 
 // ------------------------------------------------------------------ media
+// Big photos are resized to 1920 px and saved as WebP in the browser before upload, so pages stay fast.
+async function shrink(f) {
+  if (!/^image\/(jpeg|png|webp)$/.test(f.type)) return f;
+  try {
+    const bm = await createImageBitmap(f), k = Math.min(1, 1920 / bm.width), c = document.createElement('canvas');
+    c.width = Math.round(bm.width * k); c.height = Math.round(bm.height * k); c.getContext('2d').drawImage(bm, 0, 0, c.width, c.height);
+    const b = await new Promise(r => c.toBlob(r, 'image/webp', 0.8));
+    if (!b || b.size >= f.size) return f;
+    return new File([b], f.name.replace(/\.\w+$/, '') + '.webp', { type: 'image/webp' });
+  } catch (e) { return f; }
+}
 async function media(w) {
-  const c = mk('div', `${canEdit() ? `<div class="cd"><h3>Upload image</h3><input type="file" id="fu" accept="image/*" multiple><small style="color:var(--mu);display:block;margin-top:6px">Cover size: about 1600x600 px, under 300 KB (WebP or compressed JPG). Maximum 1.5 MB. The address appears below after upload; copy it, or choose the image in any Cover field.</small></div>` : ''}
+  const c = mk('div', `${canEdit() ? `<div class="cd"><h3>Upload image</h3><input type="file" id="fu" accept="image/*" multiple><small style="color:var(--mu);display:block;margin-top:6px">Photos are resized to 1920 px wide and converted to WebP automatically, so you can upload them as they are (max 8 MB before compressing). Add alt text to every image: Google reads it, and it is used wherever the image appears.</small></div>` : ''}
     <div class="cd"><h3>Images</h3><div id="ml" class="mgrid">Loading…</div></div>`);
   w.append(c);
   const list = async () => {
     try {
       const r = await api('media');
-      $('#ml').innerHTML = r.media.map(f => `<figure class="mi"><img src="${esc(f.path)}" alt="" loading="lazy"><figcaption><code title="${esc(f.path)}">${esc(f.path)}</code><small>${Math.round(f.size / 1024)} KB${f.builtin ? ' · built in' : ''}</small>
-        <span class="ac"><button class="btn sm" data-c="${esc(f.path)}">Copy address</button>${!f.builtin && canEdit() ? `<button class="btn sm d" data-del="${esc(f.name)}">Delete</button>` : ''}</span></figcaption></figure>`).join('') || 'No images yet';
-      document.querySelectorAll('[data-c]').forEach(b => b.onclick = async () => { try { await navigator.clipboard.writeText(b.dataset.c); toast('Copied ' + b.dataset.c); } catch (e) { toast(b.dataset.c); } });
+      $('#ml').innerHTML = r.media.map((f, n) => `<figure class="mi"><img src="${esc(f.path)}" alt="${esc(f.alt || '')}" loading="lazy"><figcaption><code title="${esc(f.path)}">${esc(f.path)}</code><small>${Math.round(f.size / 1024)} KB${f.builtin ? ' · built in' : ''}</small>
+        <label style="display:block;margin:6px 0"><span style="font-size:.8rem;color:var(--mu)">Alt text</span><input data-alt="${n}" value="${esc(f.alt || '')}" placeholder="Describe the image" ${canEdit() ? '' : 'disabled'}></label>
+        <span class="ac"><button class="btn sm" data-c="${esc(f.path)}">Copy address</button><button class="btn sm" data-h="${n}">Copy HTML</button>${!f.builtin && canEdit() ? `<button class="btn sm d" data-del="${esc(f.name)}">Delete</button>` : ''}</span></figcaption></figure>`).join('') || 'No images yet';
+      const copy = async v => { try { await navigator.clipboard.writeText(v); toast('Copied'); } catch (e) { toast(v); } };
+      document.querySelectorAll('[data-c]').forEach(b => b.onclick = () => copy(b.dataset.c));
+      document.querySelectorAll('[data-h]').forEach(b => b.onclick = () => { const f = r.media[+b.dataset.h]; copy(`<img src="${f.path}" alt="${String(f.alt || '').replace(/"/g, '&quot;')}" loading="lazy">`); });
+      document.querySelectorAll('[data-alt]').forEach(i => i.onchange = async () => {
+        const f = r.media[+i.dataset.alt];
+        try { await api('media-alt', { method: 'PUT', body: { path: f.path, alt: i.value } }); f.alt = i.value.trim(); toast('Alt text saved'); } catch (e) { toast(e.message, 'e'); }
+      });
       document.querySelectorAll('[data-del]').forEach(b => b.onclick = async () => {
         if (!confirm('Delete ' + b.dataset.del + '? Pages that use it will show a broken image.')) return;
         try { await api('media/' + encodeURIComponent(b.dataset.del), { method: 'DELETE' }); toast('Deleted'); list(); } catch (e) { toast(e.message, 'e'); }
@@ -263,10 +281,12 @@ async function media(w) {
   list();
   const fu = $('#fu');
   if (fu) fu.onchange = async e => {
-    for (const f of e.target.files) {
-      if (f.size > 1.5e6) { toast(f.name + ' is larger than 1.5 MB. Compress it first.', 'e'); continue; }
+    for (const f0 of e.target.files) {
+      if (f0.size > 8e6) { toast(f0.name + ' is larger than 8 MB.', 'e'); continue; }
+      const f = await shrink(f0);
+      if (f.size > 1.5e6) { toast(f.name + ' is still larger than 1.5 MB after compressing. Use a smaller image.', 'e'); continue; }
       const data = await new Promise(r => { const x = new FileReader(); x.onload = () => r(String(x.result).split(',')[1]); x.readAsDataURL(f); });
-      try { const r = await api('media', { method: 'POST', body: { name: f.name, type: f.type, data } }); toast('Uploaded: ' + r.path); } catch (x) { toast('Upload failed: ' + x.message, 'e'); }
+      try { const r = await api('media', { method: 'POST', body: { name: f.name, type: f.type, data } }); toast(`Uploaded: ${r.path} (${Math.round(f.size / 1024)} KB)`); } catch (x) { toast('Upload failed: ' + x.message, 'e'); }
     }
     fu.value = ''; list();
   };
@@ -275,7 +295,7 @@ async function media(w) {
 // ------------------------------------------------------------------ history
 async function historyView(w) {
   const names = { site: 'Website settings (homepage, menus, SEO, page texts, tracking)', services: 'Services and pricing', pages: 'Pages', posts: 'Blog', faqs: 'FAQs' };
-  const c = mk('div', `<div class="cd"><div class="ac" style="margin-bottom:12px"><select id="hk" style="max-width:420px"><option value="">All sections</option>${Object.entries(names).map(([k, v]) => `<option value="${k}">${v}</option>`).join('')}</select></div><div id="hl">Loading…</div></div>`);
+  const c = mk('div', `${canEdit() ? `<div class="cd"><h3>Built-in content</h3><p style="color:var(--mu)">Load the version that came with the latest website update (from the content files in the code). Your current version stays here in History, so you can restore it.</p><div class="ac">${Object.entries(names).map(([k, v]) => `<button class="btn sm" data-bi="${k}">${esc(v.split(' (')[0])}</button>`).join('')}</div></div>` : ''}<div class="cd"><div class="ac" style="margin-bottom:12px"><select id="hk" style="max-width:420px"><option value="">All sections</option>${Object.entries(names).map(([k, v]) => `<option value="${k}">${v}</option>`).join('')}</select></div><div id="hl">Loading…</div></div>`);
   w.append(c);
   const load = async () => {
     try {
@@ -289,6 +309,11 @@ async function historyView(w) {
       });
     } catch (e) { $('#hl').textContent = e.message; }
   };
+  document.querySelectorAll('[data-bi]').forEach(b => b.onclick = async () => {
+    if (dirty.size && !confirm('You have unsaved changes. Loading reloads the content and drops them. Continue?')) return;
+    if (!confirm('Replace "' + b.textContent + '" with the built-in version? The current version stays in History.')) return;
+    try { await api(`content/${b.dataset.bi}/builtin`, { method: 'POST', body: {} }); await loadContent(); toast('Done. The live site uses the built-in version now.'); render(); } catch (e) { toast(e.message, 'e'); }
+  });
   $('#hk').onchange = load; load();
 }
 
@@ -341,7 +366,7 @@ function secret(title, value) {
 const hum = k => typeof k === 'number' ? '#' + (k + 1) : String(k).replace(/_/g, ' ').replace(/^./, c => c.toUpperCase());
 const ttl = x => x.name || x.title || x.t || x.q || x.h || x.slug || Object.values(x).find(v => typeof v === 'string') || '';
 const blank = x => Array.isArray(x) ? [] : x && typeof x === 'object' ? Object.fromEntries(Object.keys(x).map(k => [k, blank(x[k])])) : typeof x === 'boolean' ? false : typeof x === 'number' ? 0 : '';
-const HP = {'track.gtm':['GTM-XXXXXXX','Google Tag Manager container ID'],'track.ga4':['G-XXXXXXXXXX','GA4 ID. Leave empty if GA4 runs inside GTM'],'track.ads':['AW-XXXXXXXXX','Google Ads conversion ID'],'track.meta':['123456789012345','Meta (Facebook) Pixel ID'],'track.custom':['','Any other tracking script. Loads after cookie consent'],'book.url':['https://calendar.app.google/...','Google Calendar appointment page link'],'forms.endpoint':['https://formspree.io/f/xxxx','Optional. Also emails you each message (messages are always saved in the Inbox)'],'tiers.pay':['https://...','Checkout link (Lemon Squeezy, Paddle, SSLCommerz...). Empty = goes to Contact'],'slug':['','URL part: lowercase letters, numbers and dashes only'],'body':['','HTML content. Use h2, p, ul and a tags'],'service':['','Service slug for internal link, e.g. ai-automation'],'seo_title':['','Shown in Google. 30-60 characters including brand'],'cover':['','Banner image at the top of the page. Upload it in Media Library, then choose it here. Empty = default brand cover'],'address':['','Shown in footer and Organization schema'],'phone':['+44 ...','Shown in footer'],'domain':['https://briefboxdigital.com','Your main address. Used for canonical links, sitemap and social previews']};
+const HP = {'track.gtm':['GTM-XXXXXXX','Google Tag Manager container ID'],'track.ga4':['G-XXXXXXXXXX','GA4 ID. Leave empty if GA4 runs inside GTM'],'track.ads':['AW-XXXXXXXXX','Google Ads conversion ID'],'track.meta':['123456789012345','Meta (Facebook) Pixel ID'],'track.custom':['','Any other tracking script. Loads after cookie consent'],'book.url':['https://calendar.app.google/...','Google Calendar appointment page link'],'forms.endpoint':['https://formspree.io/f/xxxx','Optional. Also emails you each message (messages are always saved in the Inbox)'],'tiers.pay':['https://...','Checkout link (Lemon Squeezy, Paddle, SSLCommerz...). Empty = goes to Contact'],'slug':['','URL part: lowercase letters, numbers and dashes only'],'body':['','HTML content. Use h2, p, ul and a tags'],'service':['','Service slug for internal link, e.g. ai-automation'],'seo_title':['','Shown in Google. 30-60 characters including brand'],'cover':['','Banner image at the top of the page. Upload it in Media Library, then choose it here. Empty = default brand cover'],'address':['','Shown in footer and Organization schema'],'phone':['+44 ...','Shown in footer'],'domain':['https://briefboxdigital.com','Your main address. Used for canonical links, sitemap and social previews'],'cover_alt':['Describe the image, e.g. Team planning an AI automation workflow','Alt text for the cover image: helps Google and screen readers. Empty = the Media Library alt text, then the page heading'],'city':['Dhaka','Shown in Organization schema for Google'],'country':['BD','Two-letter country code, e.g. BD, GB, US']};
 const isHex = v => /^#[0-9a-f]{6}$/i.test(v);
 const lim = (k, pp) => (k === 'seo_title' || pp === 'home.meta' || /^pg\.\w+\.title$/.test(pp)) ? [30, 60, 'title'] : (/^(description|desc)$/.test(k) || pp === 'meta' || /^pg\.\w+\.desc$/.test(pp)) ? [70, 160, 'description'] : 0;
 function inp(o, k, pp) {
@@ -353,7 +378,11 @@ function inp(o, k, pp) {
       try {
         const im = (await api('media')).media; if (!im.length) throw 0;
         const s = mk('select', '<option value="">Select an image…</option>' + im.map(f => '<option>' + esc(f.path) + '</option>').join(''));
-        s.onchange = () => { t.value = s.value; set(s.value); s.remove(); }; g.after(s);
+        s.onchange = () => {
+          t.value = s.value; set(s.value); s.remove();
+          const f = im.find(x => x.path === t.value), ai = g.closest('.cd, .sbx, details')?.querySelector('[data-k$="cover_alt"]');
+          if (f && f.alt && 'cover_alt' in o && !o.cover_alt) { o.cover_alt = f.alt; if (ai) ai.value = f.alt; chg(curF); }
+        }; g.after(s);
       } catch (x) { toast('No images yet. Upload one in Media Library first.', 'e'); }
       b.textContent = 'Choose image';
     };
@@ -363,7 +392,7 @@ function inp(o, k, pp) {
   if (typeof v === 'number') { i = mk('input'); i.type = 'number'; i.value = v; i.oninput = () => set(+i.value); return i; }
   if (isHex(v)) { const g = mk('div', '<input type="color"><input>', 'cl'), c = g.children[0], t = g.children[1]; c.value = t.value = v; c.oninput = () => { t.value = c.value; set(c.value); }; t.oninput = () => { if (isHex(t.value)) { c.value = t.value; set(t.value); } }; return g; }
   if (String(v).length > 70 || /[\n<]/.test(v) || /^(body|custom|intro|p|a)$/.test(k)) { i = mk('textarea'); i.rows = Math.min(14, Math.max(3, Math.ceil(String(v).length / 80))); i.value = v; i.oninput = () => set(i.value); return i; }
-  i = mk('input'); i.value = v ?? ''; i.placeholder = (HP[pp] || HP[k] || [])[0] || ''; i.oninput = () => set(i.value); return i;
+  i = mk('input'); i.value = v ?? ''; i.dataset.k = pp; i.placeholder = (HP[pp] || HP[k] || [])[0] || ''; i.oninput = () => set(i.value); return i;
 }
 function F(o, k, box, p, top) {
   const v = o[k], pp = String(p || k).replace(/\.\d+/g, ''), w = mk('div', '', 'fd');

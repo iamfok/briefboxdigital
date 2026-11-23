@@ -2,7 +2,20 @@
 // so /assets/style.css and /assets/app.js work unchanged.
 import { sortedPosts } from '@/lib/content';
 
-export const ASSET_V = '20261117';
+export const ASSET_V = '20261124';
+
+// Images shipped in /public/assets that also have a smaller .webp copy next to them.
+const WEBP = /^\/assets\/(uploads\/[\w-]+\.jpg|logo-h\.png|logo-h-dark\.png|logo\.png|mark\.png)$/;
+export const webpOf = src => WEBP.test(String(src || '')) ? String(src).replace(/\.(jpg|png)$/, '.webp') : '';
+// <img> with a WebP source when one exists. Keeps the original as a fallback for old browsers.
+export function Pic({ src, ...rest }) {
+  const w = webpOf(src);
+  const img = <img src={src} decoding="async" {...rest} />;
+  return w ? <picture><source srcSet={w} type="image/webp" />{img}</picture> : img;
+}
+const plain = s => String(s ?? '').replace(/\*/g, '').trim();
+// Alt text for a cover: the one typed in the admin, then the Media Library one, then the page heading.
+export const coverAlt = (C, img, alt, h1) => plain(alt) || (C && C.mediaAlt && C.mediaAlt[img]) || plain(h1);
 export const domain = S => String(S.domain || 'https://briefboxdigital.com').replace(/\/$/, '');
 export const bookUrl = S => (S.book && S.book.url) || '/contact';
 
@@ -19,15 +32,16 @@ export const crumbs = (D, l) => ({ '@context': 'https://schema.org', '@type': 'B
 export const faqLd = l => l && l.length ? { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: l.map(x => ({ '@type': 'Question', name: x.q, acceptedAnswer: { '@type': 'Answer', text: x.a } })) } : null;
 
 // Next.js metadata for a page (title, description, canonical, robots, Open Graph, Twitter, icons)
-export function pageMeta(S, { u, title, desc, type = 'website', ni = false }) {
+export function pageMeta(S, { u, title, desc, type = 'website', ni = false, img = '' }) {
   const D = domain(S), url = D + (u === '/' ? '' : u);
+  const image = img && img.startsWith('/') ? D + img : /^https:\/\//.test(img) ? img : D + '/assets/og.png';
   return {
     metadataBase: new URL(D),
     title, description: desc,
     alternates: { canonical: url },
     robots: ni ? 'noindex,follow' : 'index,follow,max-image-preview:large',
-    openGraph: { siteName: S.brand, type, title, description: desc, url, images: [D + '/assets/og.png'] },
-    twitter: { card: 'summary_large_image', title, description: desc },
+    openGraph: { siteName: S.brand, type, title, description: desc, url, locale: 'en_GB', images: [{ url: image, alt: title }] },
+    twitter: { card: 'summary_large_image', title, description: desc, images: [image] },
     icons: { icon: '/assets/mark.png', apple: '/assets/mark.png' },
   };
 }
@@ -42,7 +56,7 @@ export function Shell({ C, u, ld = [], children }) {
   const act = x => u === x || (x !== '/' && u.startsWith(x + '/'));
   const org = { '@context': 'https://schema.org', '@type': 'Organization', name: S.brand, url: D, logo: D + L.full, email: S.email, sameAs: (S.social || []).map(s => s.u) };
   if (S.phone) org.telephone = S.phone;
-  if (S.address) org.address = { '@type': 'PostalAddress', streetAddress: S.address };
+  if (S.address) org.address = { '@type': 'PostalAddress', streetAddress: S.address, ...(S.city ? { addressLocality: S.city } : {}), ...(S.country ? { addressCountry: S.country } : {}) };
   const graph = [org, ...(u === '/' ? [{ '@context': 'https://schema.org', '@type': 'WebSite', name: S.brand, url: D }] : []), ...ld].filter(Boolean);
   const vars = `:root{--bg:${T.bg};--c1:${T.c1};--c2:${T.c2};--c3:${T.c3}}`.replace(/</g, '');
   return (
@@ -52,11 +66,11 @@ export function Shell({ C, u, ld = [], children }) {
       <JsonLd data={graph} />
       <a className="skip" href="#main">Skip to content</a>
       <header className="nav"><div className="w nv">
-        <a className="logo" href="/"><img src={L.head} alt={`${S.brand} logo`} width={L.hw} height={L.hh} /></a>
+        <a className="logo" href="/"><Pic src={L.head} alt={`${S.brand} logo`} width={L.hw} height={L.hh} fetchPriority="high" /></a>
         <input type="checkbox" id="mt" hidden /><label className="bur" htmlFor="mt" aria-label="Menu">☰</label>
         <nav className="nl" aria-label="Main">
           {(S.nav || []).map((n, i) => n.children && n.children.length
-            ? <div className="dd" key={i}><NavLink n={n} act={act} /><span className="car" aria-hidden="true">▾</span>
+            ? <div className="dd" key={i}><NavLink n={n} act={x => u === x || n.children.some(c => act(c.u))} /><span className="car" aria-hidden="true">▾</span>
                 <div className="dm">{n.children.map((c, j) => <NavLink key={j} n={c} act={act} />)}</div></div>
             : <NavLink key={i} n={n} act={act} />)}
         </nav>
@@ -66,7 +80,7 @@ export function Shell({ C, u, ld = [], children }) {
       <footer className="ft"><div className="w">
         <div className="fg">
           <div>
-            <a href="/"><img src={L.full} alt={S.brand} width={L.fw} height={L.fh} loading="lazy" style={{ width: 190, height: 'auto' }} /></a>
+            <a href="/" aria-label={`${S.brand} home`}><Pic src={L.full} alt={S.brand} width={L.fw} height={L.fh} loading="lazy" style={{ width: 190, height: 'auto' }} /></a>
             <p className="mu">{S.footer.about}</p>
             <p className="mu sm">
               <a href={`mailto:${S.email}`}>{S.email}</a>
@@ -88,11 +102,12 @@ export function Shell({ C, u, ld = [], children }) {
   );
 }
 
-export function Cover({ S, tag, h1, intro, img, children }) {
+export function Cover({ S, C, tag, h1, intro, img, alt, children }) {
+  const own = !!img;
   img = img || S.cover || '';
   return (
     <header className={'cv' + (img ? ' has' : '')}>
-      {img ? <img className="cvi" src={img} alt="" fetchPriority="high" /> : null}
+      {img ? <Pic className="cvi" src={img} alt={coverAlt(C, img, own ? alt : S.cover_alt, h1)} width="1600" height="900" fetchPriority="high" /> : null}
       <div className="w cvt">
         {tag ? <span className="tag">{tag}</span> : null}
         <h1><Hl s={h1} /></h1>

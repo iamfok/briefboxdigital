@@ -34,7 +34,7 @@ const nextConfig = {
   async headers() {
     return [
       { source: '/:path*', headers: security },
-      { source: '/assets/:path*', headers: [{ key: 'Cache-Control', value: 'public, max-age=604800, stale-while-revalidate=86400' }] },
+      { source: '/assets/:path*', headers: [{ key: 'Cache-Control', value: 'public, max-age=2592000, stale-while-revalidate=86400' }] },
       { source: '/admin', headers: privateArea },
       { source: '/admin/:path*', headers: privateArea },
       { source: '/portal', headers: privateArea },

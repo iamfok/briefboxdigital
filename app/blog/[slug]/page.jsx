@@ -11,7 +11,7 @@ export async function generateMetadata({ params }) {
   const { slug } = await params;
   const C = await getContent(), p = find(C, slug);
   if (!p) return {};
-  return pageMeta(C.site, { u: '/blog/' + p.slug, type: 'article', title: postTitle(C.site, p), desc: p.desc });
+  return pageMeta(C.site, { u: '/blog/' + p.slug, type: 'article', title: postTitle(C.site, p), desc: p.desc, img: p.cover });
 }
 export default async function Page({ params }) {
   const { slug } = await params;

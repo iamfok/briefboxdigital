@@ -1,5 +1,5 @@
 import { Fragment } from 'react';
-import { Shell, Hl, Faqs, Cta, PostCard, Feat, Ring, FLOW, Cover, Tiers, crumbs, faqLd, bookUrl, domain, latestPosts } from '@/components/site';
+import { Shell, Hl, Faqs, Cta, PostCard, Feat, Ring, FLOW, Cover, Tiers, Pic, coverAlt, crumbs, faqLd, bookUrl, domain, latestPosts } from '@/components/site';
 import { sortedPosts } from '@/lib/content';
 
 export function HomeView({ C }) {
@@ -8,7 +8,7 @@ export function HomeView({ C }) {
   return (
     <Shell C={C} u="/" ld={[faqLd(C.faqs.home)]}>
       <div className="hs">
-        {H.cover ? <img className="cvi" src={H.cover} alt="" fetchPriority="high" /> : null}
+        {H.cover ? <Pic className="cvi" src={H.cover} alt={coverAlt(C, H.cover, H.cover_alt, H.title)} width="1600" height="900" fetchPriority="high" /> : null}
         <canvas id="hb" aria-hidden="true" />
         <section className="w hero">
           <div>
@@ -20,7 +20,7 @@ export function HomeView({ C }) {
           <div className="orbit" aria-hidden="true">
             <span className="ring r1"><Ring items={H.ring1} /></span>
             <span className="ring r2"><Ring items={H.ring2} /></span>
-            <img className="core" src="/assets/mark.png" alt="" width="256" height="256" />
+            <Pic className="core" src="/assets/mark.png" alt="" width="256" height="256" />
           </div>
         </section>
       </div>
@@ -33,7 +33,7 @@ export function HomeView({ C }) {
         ))}</div>
       </section>
 
-      {SV.map((s, i) => (
+      {SV.filter(s => s.group !== 'product').map((s, i) => (
         <section key={s.slug} className={'w sec alt' + (i % 2 ? ' rev' : '')}>
           <div className="sp"><span className="tag">{s.name}</span><h2><Hl s={s.hh} /></h2><p className="mu">{s.short}</p>
             {s.slug === 'ai-automation' ? <div className="flow" aria-hidden="true">{FLOW.map((f, j) => <Fragment key={j}>{j ? <span className="ar">→</span> : null}<span className="node">{f}</span></Fragment>)}</div> : null}
@@ -57,7 +57,7 @@ export function ServicesHubView({ C }) {
   const S = C.site, hub = S.pg.hub, D = domain(S);
   return (
     <Shell C={C} u="/services" ld={[crumbs(D, [['Home', '/'], ['Services', '/services']])]}>
-      <Cover S={S} tag="Services" h1={hub.h1} intro={hub.intro} img={hub.cover} />
+      <Cover S={S} tag="Services" h1={hub.h1} intro={hub.intro} img={hub.cover} alt={hub.cover_alt} C={C} />
       <section className="w sec"><div className="grid">{C.services.map(s => (
         <article key={s.slug} className="card"><div className="ic">{s.icon}</div><h2 className="h3"><a href={`/services/${s.slug}`}>{s.name}</a></h2>
           <p className="mu">{s.short}</p><p className="row"><a className="more" href={`/services/${s.slug}`}>Learn more →</a><a className="more" href={`/pricing#${s.slug}`}>Pricing</a></p></article>
@@ -67,10 +67,12 @@ export function ServicesHubView({ C }) {
   );
 }
 
+const prices = s => s.tiers.map(t => Number(String(t.price || '').replace(/[^\d.]/g, ''))).filter(n => n > 0);
 export const serviceLd = (C, s) => {
   const S = C.site, D = domain(S), u = '/services/' + s.slug;
   return [crumbs(D, [['Home', '/'], ['Services', '/services'], [s.name, u]]),
-    { '@context': 'https://schema.org', '@type': 'Service', name: s.name, description: s.meta, url: D + u, provider: { '@type': 'Organization', name: S.brand, url: D }, areaServed: ['United States', 'United Kingdom', 'Europe'] },
+    { '@context': 'https://schema.org', '@type': 'Service', name: s.name, description: s.meta, url: D + u, provider: { '@type': 'Organization', name: S.brand, url: D }, areaServed: ['United States', 'United Kingdom', 'Europe'],
+      ...(prices(s).length ? { offers: { '@type': 'AggregateOffer', priceCurrency: 'USD', lowPrice: Math.min(...prices(s)), highPrice: Math.max(...prices(s)), offerCount: prices(s).length } } : {}) },
     faqLd(s.faq)];
 };
 
@@ -79,7 +81,7 @@ export function ServiceView({ C, s }) {
   const rel = sortedPosts(C).filter(p => p.service === s.slug);
   return (
     <Shell C={C} u={u} ld={serviceLd(C, s)}>
-      <Cover S={S} tag={s.name} h1={s.h1} intro={s.intro} img={s.cover}>
+      <Cover S={S} tag={s.name} h1={s.h1} intro={s.intro} img={s.cover} alt={s.cover_alt} C={C}>
         <div className="row"><a className="btn" href={book} data-ev="schedule">{S.cta}</a><a className="btn gh" href={`/pricing#${s.slug}`}>View pricing</a></div>
       </Cover>
       <section className="w sec"><h2>What is <span className="g">included</span></h2><div className="grid">{s.features.map((f, i) => <Feat key={i} f={f} />)}</div></section>
@@ -87,7 +89,7 @@ export function ServiceView({ C, s }) {
       <section className="w sec"><h2>How the <span className="g">process</span> works</h2>
         <div className="grid">{s.process.map((x, i) => <div key={i} className="card"><h3>{i + 1}. {x.t}</h3><p className="mu">{x.d}</p></div>)}</div></section>
       <section className="w sec"><div className="cta"><h2>Packages for <span className="g">{s.name}</span></h2>
-        <p className="mu">Three clear packages with USD pricing. {s.from}.</p><a className="btn" href={`/pricing#${s.slug}`}>Compare packages</a></div></section>
+        <p className="mu">Clear packages with USD pricing. {s.from}.</p><a className="btn" href={`/pricing#${s.slug}`}>Compare packages</a></div></section>
       <Faqs list={s.faq} title={s.name + ' *FAQ*'} />
       {rel.length ? <section className="w sec"><h2>Related <span className="g">guides</span></h2><div className="grid">{rel.map(p => <PostCard key={p.slug} p={p} />)}</div></section> : null}
       <section className="w sec"><h2>Explore other services</h2>
@@ -104,7 +106,7 @@ export function PricingView({ C }) {
     { '@context': 'https://schema.org', '@type': 'ItemList', itemListElement: offers.map((o, i) => ({ '@type': 'ListItem', position: i + 1, item: o })) }];
   return (
     <Shell C={C} u="/pricing" ld={ld}>
-      <Cover S={S} tag="Pricing" h1={pr.h1} intro={pr.intro} img={pr.cover}>
+      <Cover S={S} tag="Pricing" h1={pr.h1} intro={pr.intro} img={pr.cover} alt={pr.cover_alt} C={C}>
         <div className="row chips">{SV.map(s => <a key={s.slug} className="btn gh sm" href={`#${s.slug}`}>{s.name}</a>)}</div>
       </Cover>
       {SV.map(s => (
@@ -122,7 +124,7 @@ export function BlogView({ C }) {
   const S = C.site, bl = S.pg.blog, D = domain(S);
   return (
     <Shell C={C} u="/blog" ld={[crumbs(D, [['Home', '/'], ['Blog', '/blog']]), faqLd(C.faqs.blog)]}>
-      <Cover S={S} tag="Blog" h1={bl.h1} intro={bl.intro} img={bl.cover} />
+      <Cover S={S} tag="Blog" h1={bl.h1} intro={bl.intro} img={bl.cover} alt={bl.cover_alt} C={C} />
       <section className="w sec"><div className="grid">{sortedPosts(C).map(p => <PostCard key={p.slug} p={p} />)}</div></section>
       <Faqs list={C.faqs.blog} title="Blog *FAQ*" />
       <Cta S={S} />
@@ -131,6 +133,17 @@ export function BlogView({ C }) {
 }
 
 export const postTitle = (S, p) => p.seo_title || ((p.title + ' | ' + S.brand).length <= 60 ? p.title + ' | ' + S.brand : p.title);
+
+// Blog/page HTML: every <img> gets lazy loading, and alt text from the Media Library when it has none.
+export function bodyHtml(C, html) {
+  return String(html || '').replace(/<img\b([^>]*)>/gi, (m, a) => {
+    const src = (a.match(/\bsrc=["']([^"']+)/i) || [])[1] || '';
+    if (!/\balt=/i.test(a)) a += ` alt="${String((C.mediaAlt || {})[src] || '').replace(/"/g, '&quot;')}"`;
+    if (!/\bloading=/i.test(a)) a += ' loading="lazy"';
+    if (!/\bdecoding=/i.test(a)) a += ' decoding="async"';
+    return `<img${a}>`;
+  });
+}
 
 export function PostView({ C, p }) {
   const S = C.site, D = domain(S), u = '/blog/' + p.slug;
@@ -142,9 +155,9 @@ export function PostView({ C, p }) {
       publisher: { '@type': 'Organization', name: S.brand, logo: { '@type': 'ImageObject', url: D + S.logo.full } } }];
   return (
     <Shell C={C} u={u} ld={ld}>
-      <Cover S={S} tag={p.tag} h1={p.title} img={p.cover}><time className="mu" dateTime={p.date}>{p.date}</time></Cover>
+      <Cover S={S} tag={p.tag} h1={p.title} img={p.cover} alt={p.cover_alt} C={C}><time className="mu" dateTime={p.date}>{p.date}</time></Cover>
       <article className="w sec prose">
-        <div dangerouslySetInnerHTML={{ __html: p.body || '' }} />
+        <div dangerouslySetInnerHTML={{ __html: bodyHtml(C, p.body) }} />
         {sv ? <p className="rel">Related service: <a href={`/services/${sv.slug}`}>{sv.name}</a> · <a href={`/pricing#${sv.slug}`}>pricing</a></p> : null}
       </article>
       {more.length ? <section className="w sec"><h2>More <span className="g">guides</span></h2><div className="grid">{more.map(x => <PostCard key={x.slug} p={x} />)}</div></section> : null}
@@ -157,9 +170,9 @@ export function PageView({ C, p }) {
   const S = C.site, D = domain(S), u = '/' + p.slug, about = p.slug === 'about';
   return (
     <Shell C={C} u={u} ld={[crumbs(D, [['Home', '/'], [p.title, u]])]}>
-      <Cover S={S} tag={about ? 'About us' : ''} h1={p.title} intro={p.desc} img={p.cover} />
+      <Cover S={S} tag={about ? 'About us' : ''} h1={p.title} intro={p.desc} img={p.cover} alt={p.cover_alt} C={C} />
       <article className="w sec prose">
-        <div dangerouslySetInnerHTML={{ __html: p.body || '' }} />
+        <div dangerouslySetInnerHTML={{ __html: bodyHtml(C, p.body) }} />
         {about ? <><h2>Contact details</h2><p>Email: <a href={`mailto:${S.email}`}>{S.email}</a>{S.phone ? <><br />Phone: {S.phone}</> : null}{S.address ? <><br />Address: {S.address}</> : null}</p></> : null}
       </article>
       {about ? <Cta S={S} /> : null}
@@ -176,7 +189,7 @@ export function ContactView({ C }) {
   const hp = <input className="hp" name="_gotcha" tabIndex={-1} autoComplete="off" aria-hidden="true" />;
   return (
     <Shell C={C} u="/contact" ld={[crumbs(D, [['Home', '/'], ['Contact', '/contact']])]}>
-      <Cover S={S} tag="Contact" h1={ct.h1} intro={ct.intro} img={ct.cover} />
+      <Cover S={S} tag="Contact" h1={ct.h1} intro={ct.intro} img={ct.cover} alt={ct.cover_alt} C={C} />
       <section className="w sec"><div className="two">
         <form className="card" id="bk" data-form="" data-kind="Booking request" data-mail={S.email} method="post" action={ep}>
           <h2 className="h3">📅 Book a free call</h2>

@@ -42,6 +42,28 @@
    ]
   },
   {
+   "t": "AI Products",
+   "u": "/services/ai-lead-qualifier",
+   "children": [
+    {
+     "t": "AI Lead Qualifier",
+     "u": "/services/ai-lead-qualifier"
+    },
+    {
+     "t": "AI Appointment Booking",
+     "u": "/services/ai-appointment-booking"
+    },
+    {
+     "t": "AI HR Automation",
+     "u": "/services/ai-hr-automation"
+    },
+    {
+     "t": "Social Media Automation",
+     "u": "/services/social-media-automation"
+    }
+   ]
+  },
+  {
    "t": "Pricing",
    "u": "/pricing"
   },
@@ -84,7 +106,7 @@
    "Business Growth"
   ],
   "svc_title": "Everything you need to *grow online*",
-  "svc_sub": "Four connected services delivered by one accountable team.",
+  "svc_sub": "Custom AI automation, ready-made AI products, marketing, content and web, delivered by one accountable team.",
   "why_title": "Why brands choose *Briefbox Digital*",
   "why": [
    {
@@ -163,7 +185,7 @@
   },
   {
    "n": "Instagram",
-   "u": "https://www.instagram.com//briefboxdigitalai",
+   "u": "https://www.instagram.com/briefboxdigitalai",
    "i": "IG",
    "c": "linear-gradient(45deg,#f09433,#dc2743,#bc1888)"
   }
@@ -182,6 +204,22 @@
      {
       "t": "AI Automation",
       "u": "/services/ai-automation"
+     },
+     {
+      "t": "AI Lead Qualifier",
+      "u": "/services/ai-lead-qualifier"
+     },
+     {
+      "t": "AI Appointment Booking",
+      "u": "/services/ai-appointment-booking"
+     },
+     {
+      "t": "AI HR Automation",
+      "u": "/services/ai-hr-automation"
+     },
+     {
+      "t": "Social Media Automation",
+      "u": "/services/social-media-automation"
      },
      {
       "t": "Digital Marketing",
@@ -254,22 +292,22 @@
   "hub": {
    "title": "AI, Marketing & Web Services | Briefbox Digital",
    "h1": "AI automation, digital marketing, content and web development",
-   "desc": "Explore Briefbox Digital services: AI automation, Google and Meta Ads, content marketing and web development for brands in the USA, UK and Europe.",
+   "desc": "Briefbox Digital services: AI automation, AI products (lead qualifier, appointment booking, HR, social media), Meta and Google Ads, content and web development.",
    "intro": "We combine four disciplines so your systems, traffic, content and website all work together. Choose a service to see what is included, how we work and answers to common questions.",
    "cover": "/assets/uploads/01-home.jpg"
   },
   "pricing": {
    "title": "Pricing & Packages | Briefbox Digital",
    "h1": "Simple pricing for AI, marketing, content and web projects",
-   "desc": "Compare Briefbox Digital packages for AI automation, digital marketing, content and web development. Clear USD prices and what is included in each plan.",
-   "intro": "Every service has three packages so you can start small and scale. Prices are in US dollars and exclude taxes such as VAT or sales tax. Need something different? We provide custom quotes.",
-   "note": "Ad spend, software subscriptions and stock imagery are not included unless stated.",
+   "desc": "Briefbox Digital pricing: AI automation from $390, AI products from $99/mo, Meta and Google Ads from $390/mo, content and websites.",
+   "intro": "Clear packages for every service, from a $149 ads audit to complete AI systems. One-time projects are paid 50% to start and 50% on delivery; monthly plans are billed in advance and can be cancelled with 30 days notice unless a minimum term is stated. Prices are in US dollars and exclude taxes such as VAT or sales tax.",
+   "note": "Not included unless stated: ad spend, WhatsApp or Meta message fees, AI model usage, third-party software subscriptions, domains and stock images. These are paid by you directly or passed on at cost. Hosting of AI products on our n8n server is included in the monthly fee.",
    "cover": "/assets/uploads/07-pricing.jpg"
   },
   "blog": {
    "title": "Blog: AI, Marketing & Web Guides | Briefbox Digital",
    "h1": "The Briefbox blog",
-   "desc": "Practical guides on AI automation, digital marketing, content and web development from the Briefbox Digital team.",
+   "desc": "Practical guides on AI automation, Meta and Google Ads, content marketing and web development from the Briefbox Digital team.",
    "intro": "Practical guides on AI automation, digital marketing, content and web development.",
    "cover": "/assets/uploads/08-blog.jpg"
   },
@@ -284,5 +322,7 @@
  "forms": {
   "endpoint": "https://formspree.io/f/xpppvanj"
  },
- "cover": "/assets/uploads/01-home.jpg"
+ "cover": "/assets/uploads/01-home.jpg",
+ "city": "Dhaka",
+ "country": "BD"
 }

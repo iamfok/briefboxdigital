@@ -325,7 +325,7 @@ function infoFields(a) {
     <label class="field"><span class="lab">Country</span><select name="country">${['', ...COUNTRIES].map(c => `<option ${c === a.country ? 'selected' : ''} value="${esc(c)}">${c || 'Choose'}</option>`).join('')}
       ${a.country && !COUNTRIES.includes(a.country) ? `<option selected>${esc(a.country)}</option>` : ''}</select></label>
     ${field('Website', 'website', a.website, { ph: 'https://' })}
-    <label class="field"><span class="lab">Type of business</span><select name="business_type">${['', 'Study abroad consultancy', 'IELTS or language centre', 'University or college', 'Training institute', 'Other'].map(c => `<option ${c === a.business_type ? 'selected' : ''} value="${esc(c)}">${c || 'Choose'}</option>`).join('')}</select></label>
+    <label class="field"><span class="lab">Type of business</span><select name="business_type">${['', 'Study abroad consultancy', 'IELTS or language centre', 'University or college', 'Training institute', 'Clinic or healthcare', 'Agency or consultancy', 'E-commerce or retail', 'Real estate', 'Professional services', 'Other'].map(c => `<option ${c === a.business_type ? 'selected' : ''} value="${esc(c)}">${c || 'Choose'}</option>`).join('')}</select></label>
   </div>${area('Office address', 'address', a.address)}`;
 }
 const INV = { unpaid: ['Waiting for payment', 'warn'], submitted: ['Payment under review', 'info'], paid: ['Paid', 'good'], rejected: ['Payment not found', 'bad'], void: ['Cancelled', ''] };

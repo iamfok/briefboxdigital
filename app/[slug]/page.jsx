@@ -12,7 +12,7 @@ export async function generateMetadata({ params }) {
   const { slug } = await params;
   const C = await getContent(), p = find(C, slug);
   if (!p) return {};
-  return pageMeta(C.site, { u: '/' + p.slug, title: `${p.title} | ${C.site.brand}`, desc: p.desc });
+  return pageMeta(C.site, { u: '/' + p.slug, title: `${p.title} | ${C.site.brand}`, desc: p.desc, img: p.cover || C.site.cover });
 }
 export default async function Page({ params }) {
   const { slug } = await params;

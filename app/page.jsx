@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 
 export async function generateMetadata() {
   const C = await getContent();
-  return pageMeta(C.site, { u: '/', title: C.site.home.meta, desc: C.site.description });
+  return pageMeta(C.site, { u: '/', title: C.site.home.meta, desc: C.site.description, img: C.site.home.cover || C.site.cover });
 }
 
 export default async function Home() {

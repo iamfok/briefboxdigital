@@ -3,52 +3,107 @@
   "slug": "ai-automation",
   "name": "AI Automation",
   "icon": "🤖",
-  "from": "From $490",
+  "from": "From $390",
   "short": "Automate leads, support and operations with AI workflows and agents.",
-  "meta": "Custom AI automation for UK, US and EU businesses: lead capture, AI chatbots, CRM and WhatsApp workflows and reporting. Book a free automation audit.",
+  "meta": "Custom AI automation for UK, US and EU businesses: lead capture, AI chatbots, CRM and WhatsApp workflows. Audit from $390, builds from $790.",
   "tiers": [
    {
     "name": "Automation Audit",
-    "desc": "Find the fastest wins.",
-    "price": "$20",
+    "desc": "Find out exactly what to automate first.",
+    "price": "$390",
+    "per": " one-time",
+    "pop": false,
+    "pay": "",
+    "features": [
+     "Map of your process, tools and data",
+     "Time and cost of every manual task",
+     "Ranked list of automations by value and effort",
+     "Tool plan with monthly running cost",
+     "90-day roadmap + 45-minute walkthrough call",
+     "Delivered in 5 working days",
+     "Fee credited to any build started within 30 days"
+    ]
+   },
+   {
+    "name": "Single Workflow",
+    "desc": "One workflow that removes one job.",
+    "price": "$790",
+    "per": " one-time",
+    "pop": false,
+    "pay": "",
+    "features": [
+     "1 workflow, up to 3 connected apps",
+     "AI step where useful (sorting, replies, summaries)",
+     "Built in n8n and hosted for you",
+     "Testing with real data + error alerts",
+     "Video guide on how it works",
+     "Live in 1-2 weeks",
+     "30 days of fixes after launch"
+    ]
+   },
+   {
+    "name": "Workflow Pack",
+    "desc": "A connected system for leads, support or operations.",
+    "price": "$1,890",
+    "per": " one-time",
+    "pop": true,
+    "pay": "",
+    "features": [
+     "3 connected workflows, up to 8 apps",
+     "AI chatbot or assistant on WhatsApp, Messenger or website",
+     "Simple results dashboard",
+     "60-minute team training + written handover",
+     "Live in 3-4 weeks",
+     "30 days of fixes and changes after launch"
+    ]
+   },
+   {
+    "name": "Custom AI System",
+    "desc": "AI agents and portals built around your business.",
+    "price": "From $3,990",
+    "per": " one-time",
+    "pop": false,
+    "pay": "",
+    "features": [
+     "Multi-step AI agents (leads, support, operations)",
+     "Client or staff portal with logins and dashboards",
+     "Custom integrations, APIs and database",
+     "Documentation and handover",
+     "Live in 4-8 weeks",
+     "60 days of support after launch",
+     "Final price after the audit"
+    ]
+   },
+   {
+    "name": "AI Care",
+    "desc": "Keep every automation running and improving.",
+    "price": "From $149",
     "per": "/month",
     "pop": false,
     "pay": "",
     "features": [
-     "Workflow and funnel review",
-     "AI opportunity roadmap with ROI estimate",
-     "1 workflow blueprint",
-     "60-minute strategy call"
-    ]
-   },
-   {
-    "name": "Workflow Build",
-    "desc": "Launch your first automations.",
-    "price": "$190",
-    "per": "/month",
-    "pop": true,
-    "pay": "",
-    "features": [
-     "Up to 3 automated workflows",
-     "CRM, email and WhatsApp integrations",
-     "AI chatbot or lead qualifier",
-     "Team training and documentation",
-     "30-day support"
+     "Hosting and 24/7 monitoring",
+     "Error fixes and AI model updates",
+     "AI Care: 2 hours of changes a month ($149)",
+     "AI Care Plus: 5 hours + prompt tuning + 1-day replies ($299)",
+     "Monthly health report",
+     "Cancel with 30 days notice"
     ]
    },
    {
     "name": "AI Partner",
-    "desc": "Ongoing AI growth partner.",
-    "price": "$999",
+    "desc": "Your ongoing automation team.",
+    "price": "$990",
     "per": "/month",
     "pop": false,
     "pay": "",
     "features": [
-     "Continuous workflow improvements",
-     "Custom AI agents and tools",
-     "Live dashboards and reports",
-     "Priority support",
-     "Monthly strategy session"
+     "A new workflow or upgrade every month",
+     "Unlimited fixes",
+     "Monthly strategy call",
+     "Priority replies within 4 working hours",
+     "3-month minimum",
+     "Software and AI usage billed at cost"
     ]
    }
   ],
@@ -102,6 +157,14 @@
    {
     "h": "Results you can expect",
     "p": "Clients typically see faster response times to new enquiries, fewer manual tasks for staff and cleaner data in their CRM. We agree measurable goals before building, such as response time, hours saved per week or leads handled automatically, and review them with you after launch so the automation keeps earning its place."
+   },
+   {
+    "h": "Start with a free automation call",
+    "p": "Book a free 30-minute call. We look at your sales, support and admin work together and you leave with three automation ideas and a rough price range, with no obligation. If you want a full plan, the $390 audit is credited to your build. Want something ready-made instead? See our AI products for lead qualification, appointment booking, HR and social media."
+   },
+   {
+    "h": "What is not included",
+    "p": "Software subscriptions, AI model usage (OpenAI, Gemini) and WhatsApp or Meta message fees are paid at cost. Before we start, you receive an estimate of the monthly running cost so there are no surprises."
    }
   ],
   "process": [
@@ -143,55 +206,628 @@
   "cover": "/assets/uploads/03-ai-automation.jpg"
  },
  {
-  "slug": "digital-marketing",
-  "name": "Digital Marketing",
-  "icon": "📈",
-  "from": "From $790/mo",
-  "short": "Google Ads, Meta Ads and tracking built for measurable growth.",
-  "meta": "Google Ads and Meta Ads management with accurate tracking, creative testing and clear reporting for brands in the USA, UK and Europe.",
+  "slug": "ai-lead-qualifier",
+  "name": "AI Lead Qualifier",
+  "icon": "🎯",
+  "group": "product",
+  "from": "From $149/mo",
+  "short": "Reply to every lead in seconds, score it with AI and assign it to the right person.",
+  "meta": "AI Lead Qualifier: instant WhatsApp and email replies, AI lead scoring (hot, warm, cold) and automatic assignment to your team. Setup $290, from $149/month.",
   "tiers": [
    {
-    "name": "Launch",
-    "desc": "One platform, done properly.",
-    "price": "$299",
-    "per": "/month",
+    "name": "Starter",
+    "desc": "For small teams getting started.",
+    "price": "$149",
+    "per": "/month + $290 setup",
     "pop": false,
     "pay": "",
     "features": [
-     "Google Ads or Meta Ads",
-     "Full tracking setup",
-     "Monthly performance report",
-     "Email support"
+     "Up to 300 leads per month",
+     "2 team members",
+     "Meta lead forms, website and WhatsApp in one list",
+     "Instant WhatsApp and email reply 24/7",
+     "AI qualifying chat + hot/warm/cold score",
+     "Auto-assign by round-robin",
+     "Automatic follow-ups",
+     "Daily digest + dashboard"
     ]
    },
    {
     "name": "Growth",
-    "desc": "Scale across both platforms.",
-    "price": "$399",
-    "per": "/month",
+    "desc": "For teams running ads every month.",
+    "price": "$249",
+    "per": "/month + $290 setup",
     "pop": true,
     "pay": "",
     "features": [
-     "Google Ads and Meta Ads",
-     "Creative testing every month",
-     "Landing page recommendations",
-     "Weekly reporting",
-     "Bi-weekly strategy calls"
+     "Up to 1,000 leads per month",
+     "5 team members",
+     "Everything in Starter",
+     "Assign by country, product or campaign",
+     "Call-status tracking",
+     "Custom questions per campaign",
+     "CSV export"
     ]
    },
    {
-    "name": "Scale",
-    "desc": "Full-funnel performance.",
-    "price": "$990",
-    "per": "/month",
+    "name": "Pro",
+    "desc": "For multi-branch or high-volume teams.",
+    "price": "$449",
+    "per": "/month + $290 setup",
     "pop": false,
     "pay": "",
     "features": [
-     "Multi-channel campaigns",
-     "CRO and A/B testing program",
-     "Email and CRM automation",
-     "Dedicated account manager",
-     "Management of $20k+ monthly ad spend"
+     "Up to 3,000 leads per month",
+     "15 team members",
+     "Everything in Growth",
+     "Multiple branches or brands",
+     "Custom reports",
+     "Priority support"
+    ]
+   }
+  ],
+  "hh": "Every lead answered in *seconds*, scored and assigned",
+  "seo_title": "AI Lead Qualifier: Instant Lead Replies | Briefbox Digital",
+  "h1": "AI Lead Qualifier: instant replies, AI scoring and auto-assign",
+  "intro": "The AI Lead Qualifier collects leads from your Meta lead forms, website and WhatsApp, replies instantly, asks your qualifying questions and scores each lead as hot, warm or cold. The best leads go straight to the right counsellor or salesperson, with a short summary, and quiet leads get automatic follow-ups. Built first for study-abroad consultancies and ready for any business that runs ads.",
+  "features": [
+   {
+    "t": "Instant replies",
+    "d": "Every lead gets a WhatsApp and email reply within seconds, day or night."
+   },
+   {
+    "t": "AI qualifying chat",
+    "d": "The AI asks your questions: budget, country, course, timeline or anything you choose."
+   },
+   {
+    "t": "Hot, warm, cold score",
+    "d": "Each lead is scored with a short summary, so your team calls the best ones first."
+   },
+   {
+    "t": "Auto-assign",
+    "d": "Leads go to the right counsellor or salesperson by your rules."
+   },
+   {
+    "t": "Automatic follow-ups",
+    "d": "Leads who go quiet get polite reminders until they reply."
+   },
+   {
+    "t": "Live dashboard",
+    "d": "See every lead, score, owner and status in one place."
+   }
+  ],
+  "sections": [
+   {
+    "h": "Who it is for",
+    "p": "Study-abroad consultancies, clinics, real estate, training providers and any business that gets leads from Meta or Google ads and loses them to slow replies."
+   },
+   {
+    "h": "Plans and limits",
+    "p": "Setup is $290 one-time on every plan. Lead limits reset each month. If you go over, you move to the next plan the following month, never a surprise bill. Cancel with 30 days notice."
+   }
+  ],
+  "process": [
+   {
+    "t": "Setup call",
+    "d": "We collect your questions, rules, team and accounts."
+   },
+   {
+    "t": "Build",
+    "d": "We set up the system on our hosted n8n for your business."
+   },
+   {
+    "t": "Test",
+    "d": "We test with real examples and you approve."
+   },
+   {
+    "t": "Go live",
+    "d": "You get a dashboard login; we monitor and improve every month."
+   }
+  ],
+  "faq": [
+   {
+    "q": "How fast can it go live?",
+    "a": "Usually 5-7 days after the setup call."
+   },
+   {
+    "q": "Can my team still talk to leads?",
+    "a": "Yes. The AI qualifies and hands over; your team takes the conversation from there."
+   },
+   {
+    "q": "What else do I pay for?",
+    "a": "WhatsApp or Meta message fees and AI model usage are billed at cost. Hosting on our n8n server is included in the monthly fee."
+   }
+  ],
+  "cover": "/assets/uploads/03-ai-automation.jpg"
+ },
+ {
+  "slug": "ai-appointment-booking",
+  "name": "AI Appointment Booking",
+  "icon": "📅",
+  "group": "product",
+  "from": "From $99/mo",
+  "short": "Customers book, reschedule and get reminders by chat, without staff answering messages.",
+  "meta": "AI appointment booking on WhatsApp, Messenger and your website: free slots, calendar booking, reminders and rescheduling. Setup $190, from $99/month.",
+  "tiers": [
+   {
+    "name": "Basic",
+    "desc": "For one person or one location.",
+    "price": "$99",
+    "per": "/month + $190 setup",
+    "pop": false,
+    "pay": "",
+    "features": [
+     "Up to 150 bookings per month",
+     "1 staff calendar",
+     "AI answers FAQs and offers free slots",
+     "Books into Google Calendar or Calendly",
+     "Confirmation + reminders 24h and 1h before",
+     "Reschedule and cancel by chat"
+    ]
+   },
+   {
+    "name": "Standard",
+    "desc": "For teams and busy clinics.",
+    "price": "$179",
+    "per": "/month + $190 setup",
+    "pop": true,
+    "pay": "",
+    "features": [
+     "Up to 500 bookings per month",
+     "5 staff calendars or branches",
+     "Everything in Basic",
+     "No-show follow-up",
+     "Deposit or payment link"
+    ]
+   },
+   {
+    "name": "Pro",
+    "desc": "For high-volume businesses.",
+    "price": "$299",
+    "per": "/month + $190 setup",
+    "pop": false,
+    "pay": "",
+    "features": [
+     "Up to 1,500 bookings per month",
+     "15 staff calendars",
+     "Everything in Standard",
+     "AI voice answering (call minutes at cost)",
+     "Review request after the visit",
+     "Monthly report"
+    ]
+   }
+  ],
+  "hh": "Bookings that happen *while you sleep*",
+  "seo_title": "AI Appointment Booking on WhatsApp | Briefbox Digital",
+  "h1": "AI Appointment Booking on WhatsApp, Messenger and web",
+  "intro": "Your AI booking assistant answers common questions, offers free time slots, books straight into your calendar and sends reminders. Customers can reschedule or cancel by chat, so your staff spend less time on messages and you get fewer no-shows.",
+  "features": [
+   {
+    "t": "Books 24/7",
+    "d": "Customers book on WhatsApp, Messenger or your website at any time."
+   },
+   {
+    "t": "Calendar sync",
+    "d": "Works with Google Calendar and Calendly, so you are never double-booked."
+   },
+   {
+    "t": "Reminders",
+    "d": "Automatic reminders cut no-shows."
+   },
+   {
+    "t": "Reschedule by chat",
+    "d": "Customers change or cancel without calling you."
+   },
+   {
+    "t": "Payments",
+    "d": "Take deposits with a payment link (Standard and Pro)."
+   },
+   {
+    "t": "Reviews",
+    "d": "Ask happy customers for a review after their visit (Pro)."
+   }
+  ],
+  "sections": [
+   {
+    "h": "Who it is for",
+    "p": "Clinics, salons, consultants, coaches, agencies and any service business that books appointments."
+   },
+   {
+    "h": "Plans and limits",
+    "p": "Setup is $190 one-time on every plan. Booking limits reset each month. Cancel with 30 days notice."
+   }
+  ],
+  "process": [
+   {
+    "t": "Setup call",
+    "d": "We collect your questions, rules, team and accounts."
+   },
+   {
+    "t": "Build",
+    "d": "We set up the system on our hosted n8n for your business."
+   },
+   {
+    "t": "Test",
+    "d": "We test with real examples and you approve."
+   },
+   {
+    "t": "Go live",
+    "d": "You get a dashboard login; we monitor and improve every month."
+   }
+  ],
+  "faq": [
+   {
+    "q": "How fast can it go live?",
+    "a": "Usually 3-5 days."
+   },
+   {
+    "q": "Can it answer phone calls?",
+    "a": "Yes, on the Pro plan, with AI voice answering. Call minutes are billed at cost."
+   },
+   {
+    "q": "What else do I pay for?",
+    "a": "WhatsApp or Meta message fees and AI model usage are billed at cost. Hosting on our n8n server is included in the monthly fee."
+   }
+  ],
+  "cover": "/assets/uploads/03-ai-automation.jpg"
+ },
+ {
+  "slug": "ai-hr-automation",
+  "name": "AI HR Automation",
+  "icon": "🧑‍💼",
+  "group": "product",
+  "from": "From $149/mo",
+  "short": "Screen applicants with AI and automate onboarding, leave and HR questions.",
+  "meta": "AI HR automation: CV screening and scoring, interview booking, onboarding, leave requests and HR questions answered by AI. Setup $390, from $149/month.",
+  "tiers": [
+   {
+    "name": "Hiring",
+    "desc": "Screen applicants automatically.",
+    "price": "$149",
+    "per": "/month + $390 setup",
+    "pop": false,
+    "pay": "",
+    "features": [
+     "Up to 300 applicants per month",
+     "Applications from forms, email or job sites in one place",
+     "AI CV scoring against your requirements, with reasons",
+     "Auto-reply to every applicant",
+     "Shortlist sent to HR",
+     "Interview booking + reminders"
+    ]
+   },
+   {
+    "name": "Hiring + HR Ops",
+    "desc": "Hiring plus everyday HR work.",
+    "price": "$279",
+    "per": "/month + $390 setup",
+    "pop": true,
+    "pay": "",
+    "features": [
+     "Everything in Hiring",
+     "Up to 50 staff",
+     "Onboarding checklist and welcome messages",
+     "Leave requests and approvals",
+     "Staff HR questions answered by AI from your policy"
+    ]
+   },
+   {
+    "name": "HR Pro",
+    "desc": "For growing companies.",
+    "price": "$449",
+    "per": "/month + $390 setup",
+    "pop": false,
+    "pay": "",
+    "features": [
+     "Everything in Hiring + HR Ops",
+     "Up to 200 staff",
+     "Attendance and leave reports",
+     "Offboarding flow",
+     "Custom reports",
+     "Priority support"
+    ]
+   }
+  ],
+  "hh": "Hire faster, with *less admin*",
+  "seo_title": "AI HR Automation & CV Screening | Briefbox Digital",
+  "h1": "AI HR Automation for hiring and HR operations",
+  "intro": "AI HR Automation collects applications, reads every CV, scores it against your job requirements and sends HR a shortlist with reasons. It books interviews, replies to every applicant and can also handle onboarding, leave requests and staff HR questions. The AI shortlists; your team always makes the hiring decision.",
+  "features": [
+   {
+    "t": "AI CV screening",
+    "d": "Every CV is read and scored against your job requirements."
+   },
+   {
+    "t": "Shortlists with reasons",
+    "d": "HR sees why each candidate was ranked, not just a score."
+   },
+   {
+    "t": "Interview booking",
+    "d": "Shortlisted candidates book a slot themselves, with reminders."
+   },
+   {
+    "t": "Onboarding",
+    "d": "New staff get checklists, documents and welcome messages automatically."
+   },
+   {
+    "t": "Leave requests",
+    "d": "Staff request leave by chat or form; managers approve in one click."
+   },
+   {
+    "t": "HR answers",
+    "d": "Staff questions are answered by AI from your own HR policy."
+   }
+  ],
+  "sections": [
+   {
+    "h": "Who it is for",
+    "p": "Companies and recruitment agencies that hire often, and HR teams that spend hours on CVs and routine questions."
+   },
+   {
+    "h": "Fair and safe hiring",
+    "p": "The AI only shortlists and explains its reasons. Every hiring decision is made by your team, and you can adjust the scoring rules at any time."
+   },
+   {
+    "h": "Plans and limits",
+    "p": "Setup is $390 one-time on every plan. Cancel with 30 days notice."
+   }
+  ],
+  "process": [
+   {
+    "t": "Setup call",
+    "d": "We collect your questions, rules, team and accounts."
+   },
+   {
+    "t": "Build",
+    "d": "We set up the system on our hosted n8n for your business."
+   },
+   {
+    "t": "Test",
+    "d": "We test with real examples and you approve."
+   },
+   {
+    "t": "Go live",
+    "d": "You get a dashboard login; we monitor and improve every month."
+   }
+  ],
+  "faq": [
+   {
+    "q": "How fast can it go live?",
+    "a": "Usually 7-10 days."
+   },
+   {
+    "q": "Does AI decide who gets hired?",
+    "a": "No. It shortlists and explains; your team decides."
+   },
+   {
+    "q": "What else do I pay for?",
+    "a": "WhatsApp or Meta message fees and AI model usage are billed at cost. Hosting on our n8n server is included in the monthly fee."
+   }
+  ],
+  "cover": "/assets/uploads/03-ai-automation.jpg"
+ },
+ {
+  "slug": "social-media-automation",
+  "name": "Social Media Automation",
+  "icon": "📲",
+  "group": "product",
+  "from": "From $149/mo",
+  "short": "Posts written, designed and published on schedule, with comments and DMs answered.",
+  "meta": "Social media automation: AI-written, designed posts auto-published to Facebook, Instagram, LinkedIn and X, with comment replies. From $149/mo.",
+  "tiers": [
+   {
+    "name": "Starter",
+    "desc": "Stay active on two platforms.",
+    "price": "$149",
+    "per": "/month + $190 setup",
+    "pop": false,
+    "pay": "",
+    "features": [
+     "12 posts per month",
+     "2 platforms",
+     "Monthly content plan from your website and offers",
+     "AI captions and hashtags + branded designs",
+     "Auto-publishing",
+     "One-click weekly approval"
+    ]
+   },
+   {
+    "name": "Growth",
+    "desc": "Grow on three platforms.",
+    "price": "$249",
+    "per": "/month + $190 setup",
+    "pop": true,
+    "pay": "",
+    "features": [
+     "20 posts + 4 reel scripts per month",
+     "3 platforms",
+     "Everything in Starter",
+     "Auto-reply to comments",
+     "Monthly report"
+    ]
+   },
+   {
+    "name": "Pro",
+    "desc": "Turn social into a lead channel.",
+    "price": "$399",
+    "per": "/month + $190 setup",
+    "pop": false,
+    "pay": "",
+    "features": [
+     "30 posts + 8 reel scripts per month",
+     "4 platforms",
+     "Everything in Growth",
+     "DM auto-reply with lead capture",
+     "Competitor content ideas"
+    ]
+   }
+  ],
+  "hh": "Show up every week, *without the work*",
+  "seo_title": "Social Media Automation Service | Briefbox Digital",
+  "h1": "Social Media Automation: posts, publishing and replies",
+  "intro": "We turn your website, offers and brand voice into a monthly content plan, write and design the posts, and publish them automatically. You approve each week in one click. Higher plans also reply to comments and DMs and capture leads from them.",
+  "features": [
+   {
+    "t": "Content plan",
+    "d": "A monthly plan built from your website, offers and brand voice."
+   },
+   {
+    "t": "Posts and designs",
+    "d": "Captions, hashtags and branded post designs made for you."
+   },
+   {
+    "t": "Auto-publishing",
+    "d": "Posts go out on schedule to Facebook, Instagram, LinkedIn or X."
+   },
+   {
+    "t": "One-click approval",
+    "d": "Approve each week in one click, or turn on auto-approve."
+   },
+   {
+    "t": "Comment replies",
+    "d": "Polite, on-brand replies to comments (Growth and Pro)."
+   },
+   {
+    "t": "DM lead capture",
+    "d": "DMs answered and leads saved for your team (Pro)."
+   }
+  ],
+  "sections": [
+   {
+    "h": "Who it is for",
+    "p": "Small businesses, consultancies and local brands that know they should post every week but never have time."
+   },
+   {
+    "h": "Plans and limits",
+    "p": "Setup is $190 one-time on every plan. Cancel with 30 days notice. Paid ads are a separate service (see Digital Marketing)."
+   }
+  ],
+  "process": [
+   {
+    "t": "Setup call",
+    "d": "We collect your questions, rules, team and accounts."
+   },
+   {
+    "t": "Build",
+    "d": "We set up the system on our hosted n8n for your business."
+   },
+   {
+    "t": "Test",
+    "d": "We test with real examples and you approve."
+   },
+   {
+    "t": "Go live",
+    "d": "You get a dashboard login; we monitor and improve every month."
+   }
+  ],
+  "faq": [
+   {
+    "q": "How fast can it go live?",
+    "a": "Usually 5-7 days."
+   },
+   {
+    "q": "Can I edit posts before they go out?",
+    "a": "Yes. You approve each week, and can edit any post."
+   },
+   {
+    "q": "What else do I pay for?",
+    "a": "WhatsApp or Meta message fees and AI model usage are billed at cost. Hosting on our n8n server is included in the monthly fee."
+   }
+  ],
+  "cover": "/assets/uploads/03-ai-automation.jpg"
+ },
+ {
+  "slug": "digital-marketing",
+  "name": "Digital Marketing",
+  "icon": "📈",
+  "from": "From $149",
+  "short": "Google Ads, Meta Ads and tracking built for measurable growth.",
+  "meta": "Google Ads and Meta Ads management with accurate tracking, creative testing and clear reporting for brands in the USA, UK and Europe.",
+  "tiers": [
+   {
+    "name": "Ads Audit",
+    "desc": "See what is wasting your ad budget.",
+    "price": "$149",
+    "per": " one-time",
+    "pop": false,
+    "pay": "",
+    "features": [
+     "Account structure, audience and bidding review",
+     "Pixel, Conversions API and GA4 check",
+     "Creative and copy review: stop, keep, test",
+     "Landing page and funnel check",
+     "Top-10 fix list + 30-minute call",
+     "Delivered in 5 working days",
+     "Fee credited to a monthly plan within 30 days"
+    ]
+   },
+   {
+    "name": "Growth Strategy",
+    "desc": "A clear plan before you spend.",
+    "price": "$290",
+    "per": " one-time",
+    "pop": false,
+    "pay": "",
+    "features": [
+     "Audience and competitor research",
+     "Offer, hooks and messaging angles",
+     "Channel plan for Meta, Google and organic",
+     "Budget split and 90-day test plan",
+     "Target cost per lead, cost per sale and ROAS",
+     "Delivered in 7 working days"
+    ]
+   },
+   {
+    "name": "Starter Ads",
+    "desc": "One platform, managed properly.",
+    "price": "$390",
+    "per": "/month + $190 setup",
+    "pop": false,
+    "pay": "",
+    "features": [
+     "Meta (Facebook + Instagram) or Google Search",
+     "For ad spend up to $3,000/month",
+     "Tracking and audience setup",
+     "Up to 3 campaigns live",
+     "4 new ad creatives per month, copy included",
+     "Weekly optimisation",
+     "Monthly report + 30-minute call",
+     "3-month minimum"
+    ]
+   },
+   {
+    "name": "Growth Ads",
+    "desc": "Meta and Google working together.",
+    "price": "$690",
+    "per": "/month + $290 setup",
+    "pop": true,
+    "pay": "",
+    "features": [
+     "Meta + Google Ads (Search and Performance Max)",
+     "For ad spend up to $10,000/month",
+     "Full tracking: GA4, Tag Manager, CAPI",
+     "Prospecting and retargeting funnel",
+     "8 new ad creatives + A/B tests every month",
+     "Leads sent to your CRM, sheet or WhatsApp",
+     "Weekly report + call every 2 weeks",
+     "3-month minimum"
+    ]
+   },
+   {
+    "name": "Scale Ads",
+    "desc": "For brands spending $10k+ a month.",
+    "price": "$1,190",
+    "per": "/month or 10% of spend",
+    "pop": false,
+    "pay": "",
+    "features": [
+     "Whichever is higher: $1,190 or 10% of ad spend",
+     "Everything in Growth Ads",
+     "TikTok, LinkedIn or YouTube on request",
+     "12+ new creatives per month, video scripts included",
+     "Lookalike, value-based and offline conversions",
+     "Weekly strategy call + live dashboard",
+     "Dedicated account manager, 4-hour replies"
     ]
    }
   ],
@@ -245,6 +881,10 @@
    {
     "h": "Reporting that makes sense",
     "p": "Every report shows spend, leads, cost per lead and, where possible, revenue and return on ad spend. We explain what changed, why it changed and what we will do next, in plain language instead of dashboards full of jargon. You always keep access to your own ad accounts and analytics."
+   },
+   {
+    "h": "Add-ons and what is not included",
+    "p": "Extra ad creatives cost $120 for a pack of 4, and short video ads edited from your footage cost $60 each. A campaign landing page is $590. Ad spend is paid by you directly to Meta, Google or other platforms and is never included in our fee. Monthly plans have a 3-month minimum because campaigns need 6-8 weeks of data to settle."
    }
   ],
   "process": [
@@ -289,52 +929,58 @@
   "slug": "content",
   "name": "Content",
   "icon": "✍️",
-  "from": "From $490/mo",
+  "from": "From $390/mo",
   "short": "Blogs, social posts and newsletters that build trust and bring leads.",
   "meta": "Content marketing for brands in the USA, UK and Europe: blog articles, social media content and email newsletters that build trust and generate leads.",
   "tiers": [
    {
     "name": "Starter",
     "desc": "Stay visible every week.",
-    "price": "$490",
+    "price": "$390",
     "per": "/month",
     "pop": false,
     "pay": "",
     "features": [
-     "4 articles or posts per month",
-     "Brand voice guide",
+     "4 blog articles (1,000-1,200 words) or 4 long LinkedIn posts",
+     "Keyword research for each piece",
+     "Brand voice guide (first month)",
+     "Publishing to your website",
      "1 revision per piece",
-     "Publishing support"
+     "3-month minimum"
     ]
    },
    {
     "name": "Growth",
-    "desc": "Build momentum.",
-    "price": "$990",
+    "desc": "Build momentum across search and social.",
+    "price": "$790",
     "per": "/month",
     "pop": true,
     "pay": "",
     "features": [
-     "8 articles per month",
-     "Social media calendar",
+     "8 SEO blog articles (1,000-1,500 words)",
+     "12 social posts + monthly content calendar",
      "1 email newsletter",
+     "On-page SEO and internal linking",
      "2 revisions per piece",
-     "Monthly content report"
+     "Monthly report: traffic, rankings, leads",
+     "3-month minimum"
     ]
    },
    {
     "name": "Authority",
     "desc": "Own your category.",
-    "price": "$1,890",
+    "price": "$1,490",
     "per": "/month",
     "pop": false,
     "pay": "",
     "features": [
-     "16 content pieces per month",
-     "Video scripts and repurposing",
-     "Content strategy sessions",
-     "Unlimited revisions",
-     "Performance analytics"
+     "12 SEO articles incl. 2 pillar guides (2,500+ words)",
+     "20 social posts + 2 email newsletters",
+     "4 short video or reel scripts",
+     "Each article repurposed into posts and an email",
+     "Quarterly strategy session",
+     "2 revisions per piece + performance dashboard",
+     "3-month minimum"
     ]
    }
   ],
@@ -432,52 +1078,96 @@
   "slug": "web-development",
   "name": "Web Development",
   "icon": "💻",
-  "from": "From $890",
+  "from": "From $590",
   "short": "Fast, modern, mobile-first websites that convert visitors.",
   "meta": "Fast, mobile-first web development for growing brands in the USA, UK and Europe: landing pages, business websites and e-commerce built to convert.",
   "tiers": [
    {
     "name": "Landing Page",
-    "desc": "One page that converts.",
-    "price": "$890",
+    "desc": "One page for one offer or campaign.",
+    "price": "$590",
     "per": " one-time",
     "pop": false,
     "pay": "",
     "features": [
-     "1 custom responsive page",
-     "Tracking and pixels ready",
-     "Contact or booking form",
-     "14-day support"
+     "1 custom page designed for your offer",
+     "Copy polish of your text",
+     "Lead or booking form to email and Google Sheet",
+     "WhatsApp click-to-chat button",
+     "Meta Pixel, GA4 and conversion events",
+     "Mobile-first, 90+ PageSpeed target",
+     "2 rounds of revisions",
+     "Live in 7 days, 14 days of support"
+    ]
+   },
+   {
+    "name": "Starter Website",
+    "desc": "A professional site for a new or small business.",
+    "price": "$990",
+    "per": " one-time",
+    "pop": false,
+    "pay": "",
+    "features": [
+     "Up to 5 pages",
+     "Mobile-first design in your brand colours",
+     "Contact form and WhatsApp button",
+     "GA4 and Meta Pixel",
+     "On-page SEO, sitemap and Search Console",
+     "GDPR cookie banner",
+     "2 rounds of revisions",
+     "Live in 10-14 days, 30 days of support"
     ]
    },
    {
     "name": "Business Website",
-    "desc": "Your full online presence.",
-    "price": "$2,490",
+    "desc": "A lead-generating site you can edit yourself.",
+    "price": "$1,890",
     "per": " one-time",
     "pop": true,
     "pay": "",
     "features": [
-     "Up to 8 pages",
-     "Blog and admin panel",
-     "Speed-optimised build",
-     "Analytics and pixel setup",
-     "30-day support"
+     "Up to 10 pages",
+     "Admin panel: edit pages, images, prices and blog",
+     "Blog ready for SEO articles",
+     "Booking or enquiry system with email and WhatsApp alerts",
+     "GA4, Meta Pixel, Google Ads conversions, Tag Manager",
+     "Technical SEO: schema, Core Web Vitals",
+     "Security headers, SSL, spam protection",
+     "3 rounds of revisions",
+     "Live in 3-4 weeks, 30 days of support + training call"
     ]
    },
    {
-    "name": "Custom and E-commerce",
-    "desc": "Built around your business.",
-    "price": "$5,900+",
+    "name": "E-commerce & Custom",
+    "desc": "Online stores, portals and custom features.",
+    "price": "From $3,490",
     "per": " one-time",
     "pop": false,
     "pay": "",
     "features": [
-     "Custom design and development",
-     "Online store and payments",
-     "Custom integrations and automations",
-     "Advanced analytics",
-     "60-day support"
+     "Custom design for your store or web app",
+     "Cart, checkout and payments (Stripe, PayPal, SSLCommerz, bKash)",
+     "Up to 50 products loaded",
+     "Customer or client login area",
+     "CRM, email, WhatsApp and automation integrations",
+     "Advanced tracking setup",
+     "3 rounds of revisions",
+     "Live in 4-8 weeks, 60 days of support"
+    ]
+   },
+   {
+    "name": "Website Care",
+    "desc": "Keep your site fast, safe and up to date.",
+    "price": "From $49",
+    "per": "/month",
+    "pop": false,
+    "pay": "",
+    "features": [
+     "Updates, daily backups and security checks",
+     "Uptime monitoring",
+     "Care: 1 hour of changes a month ($49)",
+     "Care Plus: 3 hours + monthly speed and SEO check ($119)",
+     "Cancel with 30 days notice"
     ]
    }
   ],
@@ -531,6 +1221,10 @@
    {
     "h": "Launch checklist and ongoing support",
     "p": "Before launch we test on real phones, tablets and desktops, check forms and tracking, set up redirects and submit your sitemap to Google Search Console. After launch we monitor performance and can provide a care plan covering updates, backups and small improvements."
+   },
+   {
+    "h": "Add-ons and what is not included",
+    "p": "Extra pages cost $90 each, professional copywriting $60 per page, and a logo with a basic brand kit $190. The domain, paid themes or plugins, stock photos and product photography are not included. Projects are paid 50% to start and 50% on delivery."
    }
   ],
   "process": [

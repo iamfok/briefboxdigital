@@ -5,8 +5,8 @@ Ekta repo te 3 ta jinis:
 | Kothay | Ki |
 |---|---|
 | `briefboxdigital.com` | Public website (home, services, pricing, blog, pages, contact). Ager site er moto hubohu, ekhon dynamic. |
-| `/admin` | Admin panel: website er shob edit, media, inbox, history, users, Lead Engine clients/payments/plans. Nijer email + password login, GitHub lagbe na. |
-| `/portal` | Lead Engine client portal: client sign up, Info, Settings, Dashboard, Subscription. |
+| `/admin` | Admin panel: website er shob edit, media, inbox, history, users, ar Automations (products, clients, payments). Nijer email + password login, GitHub lagbe na. |
+| `/portal` | Client portal: sign up, Company info, My automations (protiti automation er Settings, Dashboard, Subscription). |
 
 Database chara-o site chole (built-in content dekhay). Database connect korle admin theke edit kora jay.
 
@@ -61,22 +61,57 @@ Table gulo nije toiri hoy, kono SQL chalate hobe na.
   - Super Admin: shob kichu
   - Editor: content, media, inbox
   - Viewer: shudhu dekhte pare
-- **Lead Engine** (shudhu Super Admin): Overview, Clients (approve/pause/link workflow), Payments, Plans, Billing settings, n8n connection.
+- **Automations** (shudhu Super Admin): Overview, Clients, Payments, Products, Billing settings, n8n connection.
 
 Save & publish korle live site e kichu second er moddhe change dekha jay.
 
-## 4. Lead Engine chalu kora
-Admin → Lead Engine → **n8n connection**:
-- n8n URL: `https://n8n.velsario.com`
-- n8n API key
-- Template workflow ID
-- Shob boshano hole **Test connection** chapo.
+## 4. Automations (products)
+Protiti automation ekta **product**. Client portal e product choose kore, tar form puron kore, plan kine. Tumi approve korle n8n e workflow toiri hoy.
 
-Oi page e expiry check er URL ar `X-Cron-Key` ache. n8n e ekta workflow banao: Schedule Trigger (protidin) → HTTP Request (GET, oi URL, header `X-Cron-Key`).
+**Notun automation jog kora (code chara):**
+1. n8n e workflow ta ekbar banao, naam e `(template)` rakho, ar off rakho.
+2. Ekta **Code node** banao, naam dao `Client Settings`. Bhitore `const S = {};` likho. Workflow er baki node gula client er value `S` theke porbe (`S.li_token`, `S.client_id`, `S.company_name`, `S.tables.posts`).
+3. Admin → Automations → **Products → Add product**.
+   - **Details:** naam, icon, template workflow ID. Product e 2-3 ta workflow thakle shob ID space diye dao. Tarpor **Check template** chapo.
+   - **Client form:** client ki ki dibe (text, secret/token, dropdown, on/off, list).
+   - **Data and dashboard:** kon data table banabe ar dashboard e ki dekhabe.
+   - **Plans:** dam, meyad, mashik limit.
+   - "Shown to clients" on koro.
+4. Approve korle template copy hoy client er value shoho, protiti Webhook node notun address pay, ar data table toiri hoy.
 
-Client ra `briefboxdigital.com/portal` e sign up kore. Footer e "Client login" link deya ache.
+**Lead Engine** age thekei product hishebe ache. Tar form ar dashboard alada, bodlano hoyni.
 
-## 5. Security
+**n8n connection:** n8n URL `https://n8n.velsario.com` ar API key dao, tarpor **Save and test**. Same page e daily expiry check er URL ar `X-Cron-Key` ache: n8n e Schedule Trigger (protidin) → HTTP Request (GET, header `X-Cron-Key`).
+
+**Purono workflow jog kora:** client er page e automation khulo → "Link existing workflow" → workflow select → Link. Tarpor Subscription tab e "Paid until" date dao.
+
+## 5. Email (order confirmation, invoice, receipt)
+
+Client plan choose korle tar kache **order confirmation + invoice** email jay, payment details pathale "we are checking", tumi Mark paid korle **receipt**, approve korle "automation approved", sign up korle welcome. Tumi copy pao: new order, payment to check, sign-up.
+
+Admin → Automations → **Billing settings** → niche **Emails to clients**:
+
+**Resend (recommended, free 3,000/month):**
+1. resend.com e account → **Domains → Add domain** → `briefboxdigital.com` → je DNS record dey, Cloudflare DNS e add koro → Verify.
+2. **API Keys → Create** → key copy.
+3. Admin e: Send emails with = Resend, From = `Briefbox Digital <billing@briefboxdigital.com>`, Reply-to = `hello@briefboxdigital.com`, Your email for copies = tomar email, API key paste → **Save** → **Send test email**.
+
+**Ba nijer n8n diye:** n8n e Webhook (POST) → Gmail/SMTP node (To = `{{$json.body.to}}`, Subject = `{{$json.body.subject}}`, HTML = `{{$json.body.html}}`). Webhook er Production URL admin e boshao.
+
+Niche "Recent emails" e protiti email sent/failed dekha jay. Email fail korleo order/payment thik moto save hoy.
+
+Client portal e **Invoices** page ache: protiti invoice/receipt khule **Print or save PDF** kora jay.
+
+## 6. SEO, alt text, speed
+
+- **Alt text:** Media Library te protiti image er niche "Alt text" likho (Enter/bahire click korle save). Cover field er pashe **Cover alt** field ache; khali thakle Media Library er alt, tarpor page heading use hoy. Blog body te image dite **Copy HTML** chapo, alt soho ashe.
+- Upload korle image nije 1920px e choto hoy ar WebP hoy (8 MB porjonto upload kora jay).
+- Built-in image gula WebP e (80-90% choto), cover image e size deya, tai page jump kore na.
+- Protiti page er nijer social preview image (cover), sitemap e asol last-update date, Service schema te dam (AggregateOffer).
+- **Built-in content load:** code e content bodlale (jemon notun package), admin e age save kora version database e thake. Admin → **History** → "Built-in content" theke section ta load koro. Purono version History te theke jay.
+- Cloudflare dashboard (optional, aro fast): **Speed → Optimization** e Early Hints ar HTTP/3 on. Workers **Paid plan ($5)** nile CPU limit er "1102" error ar hoy na.
+
+## 7. Security
 - Security headers (CSP, HSTS, X-Frame-Options, nosniff, Referrer-Policy, Permissions-Policy) `next.config.mjs` e.
 - `/admin`, `/portal`, `/api` noindex ar no-store.
 - Password PBKDF2 diye hash. Session cookie HttpOnly, Secure, SameSite, signed.
@@ -86,7 +121,7 @@ Client ra `briefboxdigital.com/portal` e sign up kore. Footer e "Client login" l
 - Contact form e honeypot ar rate limit (ek IP theke ghontay 20 ta).
 - Chaile Cloudflare Access diye `/admin*` shudhu tomar email e lock koro (free).
 
-## 6. Folder
+## 8. Folder
 ```
 app/            pages (Next.js App Router), /api, /media, sitemap.xml, robots.txt
 components/     website er HTML blocks (site.jsx, views.jsx)

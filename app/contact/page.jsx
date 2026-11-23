@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 
 export async function generateMetadata() {
   const C = await getContent(), c = C.site.pg.contact;
-  return pageMeta(C.site, { u: '/contact', title: c.title, desc: c.desc });
+  return pageMeta(C.site, { u: '/contact', title: c.title, desc: c.desc, img: c.cover });
 }
 export default async function Page() {
   return <ContactView C={await getContent()} />;
