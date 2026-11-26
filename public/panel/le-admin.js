@@ -182,7 +182,8 @@ async function renderSub(id, tab) {
   const s = r.sub, a = r.account, p = r.product;
   const tabs = [['settings', 'Settings'], ['dashboard', 'Dashboard'], ['subscription', 'Subscription']];
   const acts = [];
-  if (s.status === 'pending') acts.push(['approve', 'Approve and create workflow', 'primary'], ['reject', 'Do not approve', 'danger']);
+  const hr = p.kind === 'hr';
+  if (s.status === 'pending') acts.push(['approve', hr ? 'Approve and switch on' : 'Approve and create workflow', 'primary'], ['reject', 'Do not approve', 'danger']);
   if (s.status === 'active') acts.push(['suspend', 'Pause', 'danger']);
   if (s.status === 'suspended') acts.push(['resume', 'Switch back on', 'primary']);
   if (s.status === 'rejected') acts.push(['reopen', 'Move back to review', '']);
@@ -192,11 +193,12 @@ async function renderSub(id, tab) {
       <p class="sub">${UI.stagePill(s.stage)} <code>${esc(a.client_id)}</code>${r.plan ? ` <span>${esc(r.plan.name)}</span>` : ''}${s.sub_ends_at ? ` <span>paid until ${fmtDate(s.sub_ends_at)}</span>` : ''}${s.workflow_id ? ` <span class="muted small">workflow ${esc(s.workflow_id)}</span>` : ''}</p></div>
       <div class="actions">${acts.map(([k, l, c]) => `<button class="btn ${c}" data-act="${k}">${l}</button>`).join('')}</div></div>
     ${s.status_note ? `<div class="note warn"><b>Note shown to the client:</b> ${esc(s.status_note)}</div>` : ''}
-    ${!s.live ? `<details class="help" style="margin-bottom:14px"><summary>Already built this in n8n? Link existing workflow${p.templates && p.templates.length > 1 ? 's' : ''} instead of approving</summary><div id="linkBox" class="stack" style="margin-top:10px"><p class="muted small">Loading workflows...</p></div></details>` : ''}
+    ${hr ? '<div class="note info" style="margin-bottom:14px">This automation runs on the website itself. No n8n workflow is needed: click <b>Approve and switch on</b>.</div>' : ''}
+    ${!s.live && !hr ? `<details class="help" style="margin-bottom:14px"><summary>Already built this in n8n? Link existing workflow${p.templates && p.templates.length > 1 ? 's' : ''} instead of approving</summary><div id="linkBox" class="stack" style="margin-top:10px"><p class="muted small">Loading workflows...</p></div></details>` : ''}
     <nav class="tabs">${tabs.map(([k, l]) => `<a href="#le-s/${s.id}/${k}" ${k === tab ? 'aria-current="page"' : ''}>${l}</a>`).join('')}</nav>
     <div id="tab"></div>`);
   $$('[data-act]').forEach(b => b.onclick = () => subAct(s, p, a, b.dataset.act, b));
-  if (!s.live) linkBox(s, p);
+  if (!s.live && !hr) linkBox(s, p);
   const el = $('#tab');
   if (tab === 'dashboard') {
     const opts = { load: d => api(`/subs/${s.id}/stats?days=${d}`), csvHref: d => `/api/admin/le/subs/${s.id}/data.csv?days=${d}`,
@@ -310,8 +312,8 @@ async function renderProducts() {
   put(`<div class="pagehead"><div><h1>Products</h1><p class="sub">Every automation clients can choose. Add a new one without writing code.</p></div><button class="btn primary" id="newP">Add product</button></div>
     <div class="scroll"><table class="t"><tr><th>Product</th><th>Workflows</th><th>Form fields</th><th>Clients</th><th>Shown to clients</th></tr>
       ${r.products.map(p => `<tr class="link" data-href="#le-product/${p.id}" tabindex="0"><td><b>${esc(p.icon)} ${esc(p.name)}</b><div class="muted small">${esc(p.short)}</div></td>
-        <td>${p.templates.length ? p.templates.map(t => `<code>${esc(t)}</code>`).join(' ') : '<span class="pill warn">template missing</span>'}</td>
-        <td>${p.builtin ? 'built in' : p.fields.length}</td><td>${p.live} live / ${p.clients}</td><td>${p.is_active ? '<span class="pill good">Yes</span>' : '<span class="pill">Hidden</span>'}</td></tr>`).join('')}</table></div>
+        <td>${p.kind === 'hr' ? '<span class="pill info">runs on the website</span>' : p.templates.length ? p.templates.map(t => `<code>${esc(t)}</code>`).join(' ') : '<span class="pill warn">template missing</span>'}</td>
+        <td>${p.builtin || p.kind === 'hr' ? 'built in' : p.fields.length}</td><td>${p.live} live / ${p.clients}</td><td>${p.is_active ? '<span class="pill good">Yes</span>' : '<span class="pill">Hidden</span>'}</td></tr>`).join('')}</table></div>
     <section class="section" style="margin-top:20px"><header><h2>How a product works</h2></header><div class="stack small">
       <p>1. In n8n, build the automation once and name it with <b>(template)</b>. Add a Code node named <b>Client Settings</b> with <code>const S = {};</code> and read every client value from <code>S</code> (for example <code>S.li_token</code>, <code>S.client_id</code>, <code>S.tables.posts</code>).</p>
       <p>2. Here, add the product: its template workflow ID(s), the form fields the client fills, the data tables it writes to, and what the dashboard shows. Then add plans.</p>
@@ -344,9 +346,9 @@ async function renderProduct(id, tab = 'details') {
       ${field('One line', 'short', p.short)}${area('Description', 'description', p.description)}
       <div class="grid2">${field('What it counts', 'unit', p.unit, { hint: 'plural, e.g. leads, posts' })}${field('Order', 'sort', p.sort, { type: 'number' })}</div>
       <label class="switch"><input type="checkbox" name="is_active" ${p.is_active ? 'checked' : ''}> <span>Shown to clients in the portal</span></label></div></section>
-    <section class="section"><header><h2>n8n template${p.builtin ? '' : 's'}</h2><p>${p.builtin ? 'The "LE Client ... (template)" workflow.' : 'One or more workflow IDs, separated by spaces. All are copied for each client.'}</p></header><div class="stack">
+    ${p.kind === 'hr' ? `<section class="section"><header><h2>Runs on the website</h2><p>No n8n template is needed. The two optional n8n workflows (HR 1 Daily Runner, HR 2 Events) are imported separately: HR 1 once for everyone, and HR 2 per company, with its webhook URL saved in that company's HR Settings.</p></header><input type="hidden" name="templates" value=""></section>` : `<section class="section"><header><h2>n8n template${p.builtin ? '' : 's'}</h2><p>${p.builtin ? 'The "LE Client ... (template)" workflow.' : 'One or more workflow IDs, separated by spaces. All are copied for each client.'}</p></header><div class="stack">
       ${field('Workflow ID' + (p.builtin ? '' : 's'), 'templates', p.templates.join(' '), { hint: 'the ID in the n8n workflow URL' })}
-      <div><button type="button" class="btn" id="chk">Check template</button></div><div id="chkOut"></div></div></section>
+      <div><button type="button" class="btn" id="chk">Check template</button></div><div id="chkOut"></div></div></section>`}
     <div class="savebar"><button class="btn primary" type="submit">Save product</button></div></form>`;
   $('#pd').onsubmit = async e => {
     e.preventDefault(); const f = e.target;
@@ -354,7 +356,7 @@ async function renderProduct(id, tab = 'details') {
       try { await save({ name: f.name.value, icon: f.icon.value, short: f.short.value, description: f.description.value, unit: f.unit.value, sort: f.sort.value, is_active: f.is_active.checked, templates: f.templates.value }); rerender(); } catch (err) { toast(err.message); }
     });
   };
-  $('#chk').onclick = e => busy(e.target, async () => {
+  if ($('#chk')) $('#chk').onclick = e => busy(e.target, async () => {
     try {
       const x = await api(`/products/${p.id}/check`, { method: 'POST', body: { templates: $('#pd').templates.value } });
       $('#chkOut').innerHTML = x.templates.map(t => `<div class="note ${t.ok ? 'good' : 'bad'}"><b>${esc(t.name || t.id)}</b> ${t.ok ? 'is ready.' : esc(t.error)}
