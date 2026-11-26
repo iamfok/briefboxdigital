@@ -83,7 +83,7 @@ function shell(page) {
   const tabs = [['home', 'Home'], ['attendance', 'Attendance'], ['leave', 'Leave'], ['payslips', 'Payslips'], ['more', 'More']];
   const curTab = ['payslip'].includes(page) ? 'payslips' : ['policies', 'ask', 'profile', 'approvals', 'letter'].includes(page) ? 'more' : page;
   const badge = m.pending_approvals ? `<span class="n">${m.pending_approvals}</span>` : '';
-  app.innerHTML = `<div class="tm"><header class="tm-top"><span class="co">${brandMark()}${esc(appTitle())}</span>
+  app.innerHTML = `<div class="tm"><header class="tm-top"><span class="co">${brandMark() || esc(appTitle())}</span>
     <nav aria-label="App">${top.map(([k, l]) => `<a href="#/${k === 'home' ? '' : k}" ${k === page || (page === 'payslip' && k === 'payslips') ? 'aria-current="page"' : ''}>${l}${k === 'approvals' ? badge : ''}</a>`).join('')}<a href="#" class="out">Sign out</a></nav>
     <a class="tm-me" href="#/profile" aria-label="My profile">${esc(m.employee.name.split(' ').map(x => x[0]).slice(0, 2).join(''))}</a></header>
     <main id="main"></main>
@@ -163,7 +163,7 @@ async function home(main) {
     ${checkCard()}
     ${m.policies_to_ack.length ? `<a class="note warn tm-ack" href="#/policies"><b>Please read and accept:</b> ${m.policies_to_ack.map(p => esc(p.title)).join(', ')}</a>` : ''}
     <div class="tm-sec"><h3>Leave left</h3><a class="small" href="#/leave">Apply for leave</a></div>
-    <div class="hbal">${m.balances.map(b => `<div class="hk"><span>${esc(b.name)}</span><b>${b.left == null ? '∞' : b.left}</b><small>${b.entitled == null ? 'no fixed limit' : 'of ' + b.entitled + ' days'}${b.pending ? ` · ${b.pending} waiting` : ''}</small></div>`).join('')}</div>
+    <div class="hbal">${m.balances.map(b => `<div class="hk"><span>${esc(b.name)}</span><b>${b.left == null ? '∞' : b.left}</b><small>${b.kind === 'alternate' || b.kind === 'roster' ? `${b.entitled} earned` : b.entitled == null ? 'no fixed limit' : 'of ' + b.entitled + ' days'}${b.pending ? ` · ${b.pending} waiting` : ''}</small></div>`).join('')}</div>
     <div class="tm-grid">
       <section class="hcard"><h3>Notices</h3>${m.notices.length ? `<ul class="hnotes">${m.notices.map(n => `<li><b>${esc(n.title)}</b><p>${esc(n.body)}</p><small>${fmtDate(n.created_at)}</small></li>`).join('')}</ul>` : '<p class="muted">No notices.</p>'}</section>
       <div style="display:grid;gap:16px">
@@ -179,7 +179,7 @@ const typeName = k => ((state.me.leave_types || []).find(t => t.key === k) || {}
 async function leave(main) {
   const r = await api('/leaves');
   main.innerHTML = `<div class="hhead"><div><h2>Leave</h2><p class="muted">Your request goes to ${esc(state.me.manager || 'HR')} for approval. You get an email with the answer.</p></div></div>
-    <div class="hbal" style="margin-top:14px">${r.balances.map(b => `<div class="hk"><span>${esc(b.name)}</span><b>${b.left == null ? '∞' : b.left}</b><small>${b.entitled == null ? 'no fixed limit' : `of ${b.entitled}`} · ${b.used} used${b.pending ? ` · ${b.pending} waiting` : ''}</small></div>`).join('')}</div>
+    <div class="hbal" style="margin-top:14px">${r.balances.map(b => `<div class="hk"><span>${esc(b.name)}</span><b>${b.left == null ? '∞' : b.left}</b><small>${b.kind === 'alternate' || b.kind === 'roster' ? `${b.entitled} earned this year` : b.entitled == null ? 'no fixed limit' : `of ${b.entitled}`} · ${b.used} used${b.pending ? ` · ${b.pending} waiting` : ''}</small></div>`).join('')}</div>
     <div class="tm-grid rev">
       <section class="hcard"><h3>Apply for leave</h3><form id="lf" class="hform stack">
         <label class="field"><span class="lab">Type</span><select name="type">${r.types.map(t => `<option value="${esc(t.key)}">${esc(t.name)}</option>`).join('')}</select></label>
@@ -220,8 +220,10 @@ async function attendance(main, p) {
 }
 async function payslips(main) {
   const r = await api('/payslips');
-  main.innerHTML = `<div class="hhead"><div><h2>Payslips</h2><p class="muted">Every approved salary. Open one to print or save it as PDF.</p></div></div>
-    <section class="hcard" style="margin-top:14px">${r.payslips.length ? `<ul class="tm-list">${r.payslips.map(p => `<li class="link"><a href="#/payslip/${p.id}"><div><b>${esc(monthName(p.month))}</b><small>Gross ${money(p.gross, r.currency)} · deductions ${money(p.deductions, r.currency)}</small></div><div class="r"><b>${money(p.net, r.currency)}</b></div></a></li>`).join('')}</ul>` : '<p class="muted">No payslips yet.</p>'}</section>`;
+  main.innerHTML = `<div class="hhead"><div><h2>Payslips</h2><p class="muted">Open one to print or save it as PDF. Need one that isn’t here yet? Ask for it and HR will send it.</p></div></div>
+    <section class="hcard" style="margin-top:14px">${r.payslips.length ? `<ul class="tm-list">${r.payslips.map(p => p.released ? `<li class="link"><a href="#/payslip/${p.id}"><div><b>${esc(monthName(p.month))}</b><small>Gross ${money(p.gross, r.currency)} · deductions ${money(p.deductions, r.currency)}</small></div><div class="r"><b>${money(p.net, r.currency)}</b></div></a></li>`
+      : `<li><div><b>${esc(monthName(p.month))}</b><small>${p.requested_at ? 'You asked for it. HR will send it.' : 'Salary processed'}</small></div><div class="r">${p.requested_at ? pill('Asked', 'info') : `<button class="btn small primary" data-req="${p.id}">Ask for payslip</button>`}</div></li>`).join('')}</ul>` : '<p class="muted">No salary processed yet.</p>'}</section>`;
+  $$('[data-req]', main).forEach(b => b.onclick = () => busy(b, async () => { try { await api(`/payslips/${b.dataset.req}/request`, { method: 'POST' }); toast('HR got your request'); payslips(main); } catch (e) { toast(e.message); } }));
 }
 async function payslip(main, p) {
   const r = await api('/payslips/' + p[0]);
@@ -246,20 +248,37 @@ async function ask(main) {
   };
 }
 async function profile(main) {
-  const e = state.me.employee, b = e.bank || {};
-  const files = (await api('/files')).files.filter(f => f.kind !== 'appointment');
-  main.innerHTML = `<section class="tm-card-me"><span class="hav big" aria-hidden="true">${esc(e.name.split(' ').map(x => x[0]).slice(0, 2).join(''))}</span><div><h2>${esc(e.name)}</h2><p class="muted">${esc(e.designation || '')}${e.dept ? ' · ' + esc(e.dept) : ''}</p></div></section>
+  const e = state.me.employee, b = e.bank || {}, canEdit = state.me.can_edit;
+  const files = (await api('/files')).files.filter(f => !['appointment', 'photo'].includes(f.kind));
+  const photo = e.photo ? `<img class="tm-photo" src="/api/team/files/${e.photo}" alt="">` : `<span class="hav big" aria-hidden="true">${esc(e.name.split(' ').map(x => x[0]).slice(0, 2).join(''))}</span>`;
+  const facts = rows => `<dl class="facts">${rows.map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v || '-')}</dd></div>`).join('')}</dl>`;
+  const BL = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+  main.innerHTML = `<section class="tm-card-me">${photo}<div><h2>${esc(e.name)}</h2><p class="muted">${esc(e.designation || '')}${e.dept ? ' · ' + esc(e.dept) : ''}</p></div></section>
     <div class="tm-grid">
-      <div style="display:grid;gap:16px"><section class="hcard"><h3>Job</h3><dl class="facts">${[['Employee ID', e.code], ['Designation', e.designation], ['Department', e.dept], ['Reports to', state.me.manager], ['Joined', D(e.join_date)], ['Status', e.status === 'probation' ? 'On probation' + (e.probation_end ? ' until ' + D(e.probation_end) : '') : e.status === 'notice' ? 'Serving notice' : 'Confirmed'], ['Email', e.email]].map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v || '-')}</dd></div>`).join('')}</dl></section>
+      <div style="display:grid;gap:16px"><section class="hcard"><h3>Job</h3>${facts([['Employee ID', e.code], ['Designation', e.designation], ['Team', e.dept], ['Reports to', state.me.manager], ['Joined', D(e.join_date)], ['Status', e.status === 'probation' ? 'On probation' + (e.probation_end ? ' until ' + D(e.probation_end) : '') : e.status === 'notice' ? 'Serving notice' : 'Confirmed'], ['Email', e.email]])}</section>
         <section class="hcard"><h3>Documents</h3><ul class="tm-list">${state.me.has_letter ? '<li class="link"><a href="#/letter"><div><b>Appointment letter</b><small>Open, print or save as PDF</small></div><div class="r">›</div></a></li>' : ''}
-          ${files.map(f => `<li class="link"><a href="/api/team/files/${f.id}" target="_blank" rel="noopener"><div><b>${esc(f.name)}</b><small>${esc(f.kind)}${f.expires_on ? ' · expires ' + esc(D(f.expires_on)) : ''}</small></div><div class="r">›</div></a></li>`).join('')}
+          ${files.map(f => `<li class="link"><a href="/api/team/files/${f.id}" target="_blank" rel="noopener"><div><b>${esc(f.name)}</b><small>${esc(f.kind.replace('_', ' '))}${f.expires_on ? ' · expires ' + esc(D(f.expires_on)) : ''}</small></div><div class="r">›</div></a></li>`).join('')}
           ${!state.me.has_letter && !files.length ? '<li class="muted">No documents yet.</li>' : ''}</ul></section></div>
-      <div style="display:grid;gap:16px"><form id="pf" class="hcard hform stack"><h3>Contact and payment</h3><p class="muted small">Name, job and salary are managed by HR.</p>${field('Phone', 'phone', e.phone, { type: 'tel' })}${area('Address', 'address', e.address)}${field('Emergency contact', 'emergency', e.emergency, { ph: 'Name, relation, phone' })}
-        <div class="grid2">${field('Bank', 'bank', b.bank)}${field('Branch', 'branch', b.branch)}</div><div class="grid2">${field('Account number', 'account_no', b.account_no)}${field('bKash / Nagad number', 'mobile', b.mobile)}</div>
-        <span class="error" id="pErr"></span><button class="btn primary">Save</button></form>
+      <div style="display:grid;gap:16px">
+        ${canEdit ? `<form id="pf" class="hcard hform stack"><h3>Your details</h3><p class="note warn small">You can save this <b>once</b>. After that only HR can change it, so check everything before saving.</p>
+          <label class="field"><span class="lab">Photo (JPG or PNG, under 400 KB)</span><input type="file" name="photo" accept="image/png,image/jpeg,image/webp"></label>
+          <div class="grid2">${field('Phone', 'phone', e.phone, { type: 'tel' })}${field('Date of birth', 'dob', e.dob, { type: 'date' })}</div>
+          <div class="grid2"><label class="field"><span class="lab">Blood group</span><select name="blood_group"><option value="">Choose…</option>${BL.map(x => `<option ${x === e.blood_group ? 'selected' : ''}>${x}</option>`).join('')}</select></label>${field('NID number', 'nid', e.nid, { attrs: 'inputmode="numeric"' })}</div>
+          ${field('LinkedIn profile', 'linkedin', e.linkedin, { ph: 'https://www.linkedin.com/in/your-name' })}
+          ${area('Address', 'address', e.address)}${field('Emergency contact', 'emergency', e.emergency, { ph: 'Name, relation, phone' })}
+          <div class="grid2">${field('Bank', 'bank', b.bank)}${field('Branch', 'branch', b.branch)}</div><div class="grid2">${field('Account number', 'account_no', b.account_no)}${field('bKash / Nagad number', 'mobile', b.mobile)}</div>
+          <span class="error" id="pErr"></span><button class="btn primary big">Save my details</button></form>`
+        : `<section class="hcard"><h3>Your details</h3>${facts([['Phone', e.phone], ['Date of birth', D(e.dob)], ['Blood group', e.blood_group], ['NID', e.nid], ['LinkedIn', e.linkedin], ['Address', e.address], ['Emergency contact', e.emergency], ['Bank', [b.bank, b.branch, b.account_no].filter(Boolean).join(', ')], ['bKash / Nagad', b.mobile]])}
+          <p class="tm-locked">To change anything here, ask HR.</p></section>`}
         <form id="pw" class="hcard hform stack"><h3>Password</h3>${field('Current password', 'current', '', { type: 'password', attrs: 'autocomplete="current-password"' })}${field('New password', 'next', '', { type: 'password', attrs: 'autocomplete="new-password"' })}<span class="error" id="wErr"></span><button class="btn">Change password</button></form></div></div>`;
-  $('#pf').onsubmit = async ev => { ev.preventDefault(); const v = Object.fromEntries(new FormData(ev.target));
-    await busy($('#pf button'), async () => { try { await api('/me', { method: 'PUT', body: { phone: v.phone, address: v.address, emergency: v.emergency, bank: { bank: v.bank, branch: v.branch, account_no: v.account_no, mobile: v.mobile } } }); toast('Saved'); state.me = await api('/me'); } catch (e2) { $('#pErr').textContent = e2.message; } }); };
+  const pf = $('#pf');
+  if (pf) pf.onsubmit = async ev => { ev.preventDefault(); const v = Object.fromEntries(new FormData(ev.target)); delete v.photo;
+    if (!confirm('Save your details? You can do this only once; after that HR makes any changes.')) return;
+    await busy($('#pf button.primary'), async () => { try {
+      const fl = pf.elements.photo.files[0]; let photo = null;
+      if (fl) { if (fl.size > 400000) throw new Error('The photo is larger than 400 KB.'); photo = { name: fl.name, type: fl.type, data: await new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(String(fr.result).split(',')[1]); fr.onerror = rej; fr.readAsDataURL(fl); }) }; }
+      await api('/me', { method: 'PUT', body: { phone: v.phone, dob: v.dob, blood_group: v.blood_group, nid: v.nid, linkedin: v.linkedin, address: v.address, emergency: v.emergency, bank: { bank: v.bank, branch: v.branch, account_no: v.account_no, mobile: v.mobile }, photo } });
+      toast('Saved'); state.me = await api('/me'); profile(main); } catch (e2) { $('#pErr').textContent = e2.message; } }); };
   $('#pw').onsubmit = async ev => { ev.preventDefault(); await busy($('#pw button'), async () => { try { await api('/password', { method: 'POST', body: Object.fromEntries(new FormData(ev.target)) }); ev.target.reset(); toast('Password changed'); } catch (e2) { $('#wErr').textContent = e2.message; } }); };
 }
 async function letter(main) {

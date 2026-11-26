@@ -17,7 +17,8 @@ const WD = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const SECTIONS = [['overview', 'Overview'], ['recruit', 'Recruitment'], ['employees', 'Employees'], ['teams', 'Teams'], ['attendance', 'Attendance'], ['leave', 'Leave'], ['payroll', 'Payroll'], ['policies', 'Policies & notices'], ['reports', 'Reports'], ['settings', 'Settings']];
 const scoreTone = n => n == null ? '' : n >= 70 ? 'good' : n >= 45 ? 'info' : 'bad';
 const initials = n => String(n || '?').trim().split(/\s+/).slice(0, 2).map(x => x[0]).join('').toUpperCase();
-const av = n => `<span class="hav" aria-hidden="true">${esc(initials(n))}</span>`;
+const av = (n, photo) => photo ? `<img class="hav ph" src="${X.raw}files/${photo}" alt="">` : `<span class="hav" aria-hidden="true">${esc(initials(n))}</span>`;
+const BLOODS = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
 const fileToB64 = f => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(',')[1]); r.onerror = rej; r.readAsDataURL(f); });
 async function pickFile(input) {
   const f = input.files && input.files[0];
@@ -81,7 +82,7 @@ async function overview() {
           ${o.pending_leaves.map(l => `<li>${av(l.employee_name)}<div><b>${esc(l.employee_name)}</b> asked for ${esc(typeName(l.type))}<small>${esc(DS(l.start_date))}${l.end_date !== l.start_date ? ' – ' + esc(DS(l.end_date)) : ''} · ${l.days} day${l.days === 1 ? '' : 's'}${l.reason ? ' · ' + esc(l.reason) : ''}</small></div>
             <span class="row-end"><button class="btn small" data-dec="${l.id}" data-ok="0">Decline</button><button class="btn small primary" data-dec="${l.id}" data-ok="1">Approve</button></span></li>`).join('')}
           ${o.new_applicants.slice(0, 5).map(a => `<li>${av(a.name)}<div><b>${esc(a.name)}</b> applied for ${esc(a.title)}<small>AI score ${a.score ?? '-'}</small></div><a class="btn small" href="${X.base}/recruit/applicant/${a.id}">Review</a></li>`).join('')}
-          ${o.attention.map(x => `<li><span class="hdot ${x.kind}"></span><div>${esc(x.text)} <b>${esc(D(x.date))}</b></div><a class="btn small" href="${X.base}/employees/${x.employee_id}">Open</a></li>`).join('')}
+          ${o.attention.map(x => `<li><span class="hdot ${x.kind}"></span><div>${esc(x.text)} <b>${esc(D(x.date))}</b></div><a class="btn small" href="${X.base}/${x.run_id ? `payroll/${x.run_id}` : `employees/${x.employee_id}`}">Open</a></li>`).join('')}
           ${o.tasks.map(t => `<li><input type="checkbox" data-task="${t.id}" aria-label="Done"><div>${esc(t.title)}<small>${esc(t.emp)} · ${t.kind}${t.due ? ' · due ' + esc(DS(t.due)) : ''}</small></div><a class="btn small ghost" href="${X.base}/employees/${t.employee_id}/tasks">Open</a></li>`).join('')}
           ${o.tasks_open > o.tasks.length ? `<li><span></span><div class="muted">${o.tasks_open - o.tasks.length} more onboarding and exit tasks in employee profiles</div></li>` : ''}
         </ul>` : '<p class="muted">Nothing needs your attention. Nice.</p>'}
@@ -122,7 +123,7 @@ async function employees(p) {
   const draw = () => {
     const q = $('#q').value.toLowerCase(), fd = $('#fd').value, fs = $('#fs').value;
     const rows = list.filter(e => (!q || [e.name, e.email, e.designation, e.code].join(' ').toLowerCase().includes(q)) && (!fd || e.dept === fd) && (fs === 'all' || (fs ? e.status === fs : e.status !== 'exited')));
-    $('#et').innerHTML = rows.map(e => `<tr class="link" data-href="${X.base}/employees/${e.id}" tabindex="0"><td><div class="hwho">${av(e.name)}<div><b>${esc(e.name)}</b><small>${esc(e.code)} · ${esc(e.designation || '-')}</small></div></div></td>
+    $('#et').innerHTML = rows.map(e => `<tr class="link" data-href="${X.base}/employees/${e.id}" tabindex="0"><td><div class="hwho">${av(e.name, e.photo)}<div><b>${esc(e.name)}</b><small>${esc(e.code)} · ${esc(e.designation || '-')}</small></div></div></td>
       <td>${esc(e.dept || '-')}</td><td>${esc(D(e.join_date))}</td><td>${empPill(e.status)}</td><td>${e.has_login ? pill('Active', 'good') : e.invited ? pill('Invited', 'info') : '<span class="muted">-</span>'}</td></tr>`).join('')
       || `<tr><td colspan="5" class="muted" style="padding:24px;text-align:center">${list.length ? 'No one matches.' : 'No employees yet. Add your first one.'}</td></tr>`;
     $$('#et tr[data-href]').forEach(t => { t.onclick = () => { location.hash = t.dataset.href; }; t.onkeydown = e => { if (e.key === 'Enter') location.hash = t.dataset.href; }; });
@@ -139,6 +140,8 @@ async function employeeForm(id, data) {
         <div class="grid2">${field('Full name', 'name', e.name, { attrs: 'required' })}${field('Email', 'email', e.email, { type: 'email', hint: 'needed for the employee app and payslips' })}</div>
         <div class="grid3">${field('Phone', 'phone', e.phone)}${field('Date of birth', 'dob', e.dob, { type: 'date' })}
           <label class="field"><span class="lab">Gender</span><select name="gender">${['', 'Female', 'Male', 'Other'].map(g => opt(g, g || 'Prefer not to say', e.gender)).join('')}</select></label></div>
+        <div class="grid3"><label class="field"><span class="lab">Blood group</span><select name="blood_group">${['', ...BLOODS].map(g => opt(g, g || 'Not known', e.blood_group)).join('')}</select></label>
+          ${field('NID number', 'nid', e.nid, { attrs: 'inputmode="numeric"' })}${field('LinkedIn', 'linkedin', e.linkedin, { ph: 'https://www.linkedin.com/in/…' })}</div>
         <div class="grid2">${area('Address', 'address', e.address)}${area('Emergency contact', 'emergency', e.emergency, { ph: 'Name, relation, phone' })}</div>
       </div></section>
       <section class="section"><header><h2>Job</h2></header><div class="stack">
@@ -195,7 +198,7 @@ async function employeeView(id, tab) {
   const tabs = [['details', 'Details'], ['leave', 'Leave'], ['tasks', 'Onboarding & exit'], ['docs', 'Documents'], ['notes', 'Notes'], ['pay', 'Payslips']];
   const ex = e.exit || {};
   X.v.innerHTML = `<a class="muted small" href="${X.base}/employees">← All employees</a>
-    <div class="hprof"><span class="hav big" aria-hidden="true">${esc(initials(e.name))}</span>
+    <div class="hprof"><label class="hphoto" title="Change photo">${e.photo ? `<img class="hav big ph" src="${X.raw}files/${e.photo}" alt="">` : `<span class="hav big" aria-hidden="true">${esc(initials(e.name))}</span>`}<span class="hpcam">Photo</span><input type="file" id="phf" accept="image/png,image/jpeg,image/webp" hidden></label>
       <div><h2>${esc(e.name)}</h2><p class="muted">${esc(e.designation || 'No designation')}${e.dept ? ' · ' + esc(e.dept) : ''} · ${esc(e.code)}</p>
         <p class="hmeta">${empPill(e.status)} ${e.has_login ? pill('Portal active', 'good') : e.invited ? pill('Invited', 'info') : ''} <span>Joined ${esc(D(e.join_date))}</span>
           ${e.status === 'probation' && e.probation_end ? `<span>Probation until ${esc(D(e.probation_end))}</span>` : ''}${e.status === 'notice' ? `<span>Last day ${esc(D(ex.last_day))}</span>` : ''}</p></div>
@@ -204,6 +207,7 @@ async function employeeView(id, tab) {
         ${e.status !== 'exited' && e.email && !e.has_login ? `<button class="btn small" id="inv">${e.invited ? 'Send invite again' : 'Invite to the app'}</button>` : ''}
         ${e.status !== 'exited' && e.email ? `<button class="btn small ghost" id="setpw">${e.has_login ? 'Reset app password' : 'Set app password'}</button>` : ''}
         ${e.status === 'probation' ? '<button class="btn small" id="conf">Confirm (end probation)</button>' : ''}
+        ${e.self_edited ? '<button class="btn small ghost" id="unlock" title="The employee already filled in their profile">Allow one more edit</button>' : ''}
         ${e.status !== 'exited' ? `<a class="btn small" href="${X.base}/employees/${e.id}/letter-appointment">Appointment letter</a>` : ''}
         ${e.status === 'notice' || e.status === 'exited' ? `<a class="btn small" href="${X.base}/employees/${e.id}/letter">Experience letter</a>` : ''}
         ${e.status === 'notice' ? '<button class="btn small" id="cex">Cancel exit</button>' : ''}
@@ -216,6 +220,9 @@ async function employeeView(id, tab) {
   bind('#inv', async () => { try { const x = await X.api(`employees/${e.id}/invite`, { method: 'POST' }); if (x.emailed) toast('Invite emailed to ' + e.email); else { prompt(x.held ? 'Test mode: the email is in the Outbox and was not sent. Copy the set-password link:' : 'Email could not be sent (' + (x.email_error || 'email is off') + '). Copy this link and send it yourself:', x.link); } employeeView(id, tab); } catch (er) { toast(er.message); } });
   bind('#setpw', async () => { const pw = prompt(`Set an app password for ${e.name} (8+ characters, letters and numbers). Give it to them; they sign in with ${e.email}.`, ''); if (!pw) return;
     try { const x = await X.api(`employees/${e.id}/password`, { method: 'POST', body: { password: pw } }); prompt('Password set. App link:', x.link); employeeView(id, tab); } catch (er) { toast(er.message); } });
+  bind('#unlock', async () => { try { await X.api(`employees/${e.id}/unlock`, { method: 'POST' }); toast(`${e.name} can edit their profile once more`); employeeView(id, tab); } catch (er) { toast(er.message); } });
+  $('#phf').onchange = async () => { const fl = $('#phf').files[0]; if (!fl) return; if (fl.size > 400000) return toast('The photo is larger than 400 KB.');
+    try { await X.api(`employees/${e.id}/photo`, { method: 'POST', body: { photo: { name: fl.name, type: fl.type, data: await fileToB64(fl) } } }); toast('Photo saved'); employeeView(id, tab); } catch (er) { toast(er.message); } };
   bind('#conf', async () => { if (!confirm(`Confirm ${e.name} as a permanent employee?`)) return; try { await X.api(`employees/${e.id}/confirm`, { method: 'POST' }); toast('Confirmed'); employeeView(id, tab); } catch (er) { toast(er.message); } });
   bind('#cex', async () => { if (!confirm('Cancel the exit and keep this employee?')) return; try { await X.api(`employees/${e.id}/cancel-exit`, { method: 'POST' }); toast('Exit cancelled'); employeeView(id, tab); } catch (er) { toast(er.message); } });
   const exb = $('#exit');
@@ -235,7 +242,9 @@ async function employeeView(id, tab) {
     const b = e.bank || {};
     const dl = rows => `<dl class="facts">${rows.filter(Boolean).map(([k, v]) => `<div><dt>${k}</dt><dd>${v || '<span class="muted">-</span>'}</dd></div>`).join('')}</dl>`;
     el.innerHTML = `<div class="hgrid">
-      <section class="hcard"><h3>Contact</h3>${dl([['Email', esc(e.email)], ['Phone', esc(e.phone)], ['Date of birth', esc(D(e.dob))], ['Gender', esc(e.gender)], ['Address', esc(e.address)], ['Emergency contact', esc(e.emergency)]])}</section>
+      <section class="hcard"><h3>Contact</h3>${dl([['Email', esc(e.email)], ['Phone', esc(e.phone)], ['Date of birth', esc(D(e.dob))], ['Gender', esc(e.gender)], ['Blood group', esc(e.blood_group)], ['NID', esc(e.nid)],
+        ['LinkedIn', e.linkedin ? `<a href="${esc(e.linkedin)}" target="_blank" rel="noopener">${esc(e.linkedin.replace(/^https:\/\/(www\.)?/, ''))}</a>` : ''], ['Address', esc(e.address)], ['Emergency contact', esc(e.emergency)]])}
+        ${e.self_edited ? '<p class="muted small">The employee filled this in from the app; only HR can change it now.</p>' : ''}</section>
       <section class="hcard"><h3>Job</h3>${dl([['Department', esc(e.dept)], ['Designation', esc(e.designation)], ['Type', esc(e.emp_type)], ['Joined', esc(D(e.join_date))], ['Probation ends', esc(D(e.probation_end))], ['Contract ends', esc(D(e.contract_end))]])}</section>
       <section class="hcard"><h3>Salary</h3><table class="t"><tbody>${r.gross.parts.map(x => `<tr><td>${esc(x.name)}</td><td class="n">${cur(x.amount)}</td></tr>`).join('')}<tr class="tot"><td>Gross / month</td><td class="n">${cur(r.gross.gross)}</td></tr></tbody></table></section>
       <section class="hcard"><h3>Salary payment</h3>${dl([['Method', esc(b.method)], ['Bank', esc([b.bank, b.branch].filter(Boolean).join(', '))], ['Account', esc([b.account_name, b.account_no].filter(Boolean).join(' · '))], ['Mobile wallet', esc(b.mobile)]])}</section>
@@ -247,7 +256,7 @@ async function employeeView(id, tab) {
     </div>`;
   }
   if (tab === 'leave') {
-    el.innerHTML = `<div class="hbal">${r.balances.map(b => `<div class="hk"><span>${esc(b.name)}</span><b>${b.left == null ? '∞' : b.left}</b><small>${b.entitled == null ? 'no fixed limit' : `of ${b.entitled}${b.carried ? ` (incl. ${b.carried} carried)` : ''}`} · ${b.used} used${b.pending ? ` · ${b.pending} waiting` : ''}</small></div>`).join('')}</div>
+    el.innerHTML = `<div class="hbal">${r.balances.map(b => `<div class="hk"><span>${esc(b.name)}</span><b>${b.left == null ? '∞' : b.left}</b><small>${b.kind === "alternate" || b.kind === "roster" ? `${b.entitled} earned${b.earned && b.earned.length && b.kind === "roster" ? " (" + b.earned.map(m => monthName(m).split(" ")[0]).join(", ") + ")" : ""}` : b.entitled == null ? 'no fixed limit' : `of ${b.entitled}${b.carried ? ` (incl. ${b.carried} carried)` : ''}`} · ${b.used} used${b.pending ? ` · ${b.pending} waiting` : ''}</small></div>`).join('')}</div>
       <section class="hcard"><div class="hhead"><h3>Leave history</h3><button class="btn small" id="addl">Add leave</button></div><div id="lf"></div>
       ${leaveTable(r.leaves, false)}</section>`;
     $('#addl').onclick = () => leaveForm($('#lf'), [e], e.id, () => employeeView(id, 'leave'));
@@ -368,7 +377,7 @@ async function attendance(p) {
       <b>${new Date(date + 'T00:00:00Z').toLocaleDateString('en-GB', { weekday: 'long', timeZone: 'UTC' })}</b>${off ? pill(r.holiday || 'Weekend', 'info') : ''}
       <span class="row-end"><button class="btn small" id="allp" ${off ? 'disabled' : ''}>Mark everyone present</button></span></div>
     <form id="af" class="hcard flush"><div class="scroll"><table class="t ht att"><thead><tr><th>Employee</th><th>Status</th><th>In</th><th>Out</th><th>Note</th></tr></thead><tbody>
-      ${r.rows.map(x => { const locked = ['LV', 'HO', 'WE', '-'].includes(x.code); return `<tr data-e="${x.employee.id}"><td><div class="hwho">${av(x.employee.name)}<div><b>${esc(x.employee.name)}</b><small>${esc(x.employee.designation || '')}</small>${where(x)}</div></div></td>
+      ${r.rows.map(x => { const locked = ['LV', 'HO', 'WE', '-'].includes(x.code); return `<tr data-e="${x.employee.id}"><td><div class="hwho">${av(x.employee.name, x.employee.photo)}<div><b>${esc(x.employee.name)}</b><small>${esc(x.employee.designation || '')}</small>${where(x)}</div></div></td>
         <td>${locked ? pill(x.label, x.code === 'LV' ? 'info' : '') : `<div class="seg" role="radiogroup" aria-label="Status for ${esc(x.employee.name)}">${Object.entries(ATT).map(([k, l]) => `<label class="s-${k}"><input type="radio" name="s${x.employee.id}" value="${k}" ${x.code === k ? 'checked' : ''}><span>${l}</span></label>`).join('')}<label class="s-0"><input type="radio" name="s${x.employee.id}" value="" ${!x.code ? 'checked' : ''}><span title="Not marked: counts as present">–</span></label></div>`}</td>
         <td>${locked ? '' : `<input type="time" name="i${x.employee.id}" value="${esc(x.in_time || '')}" aria-label="In time">`}</td><td>${locked ? '' : `<input type="time" name="o${x.employee.id}" value="${esc(x.out_time || '')}" aria-label="Out time">`}</td>
         <td>${locked ? '' : `<input name="n${x.employee.id}" value="${esc(x.note || '')}" aria-label="Note" placeholder="Optional">`}</td></tr>`; }).join('') || '<tr><td colspan="5" class="muted" style="padding:24px;text-align:center">No employees on this date.</td></tr>'}
@@ -404,10 +413,25 @@ async function recruit(p) {
   const r = await X.api('jobs');
   X.v.innerHTML = `${head('Recruitment', 'Share your careers page. Every application is screened by AI; you decide who moves forward.', `<a class="btn primary" href="${X.base}/recruit/new">Post a job</a>`)}
     <div class="hcopy"><span>Your careers page</span><code>${esc(r.careers_url)}</code><button class="btn small" data-copy="${esc(r.careers_url)}">Copy link</button><a class="btn small" href="${esc(r.careers_url)}" target="_blank" rel="noopener">Open</a></div>
+    <section class="hcard soft hdrop"><div><h3>Drop CVs for any position</h3><p class="muted small">Drop a pile of CVs (PDF, Word or photo). Each one goes to the position it fits best, is screened, and the candidate is emailed${X.S.recruit.auto_interview ? ' or booked for an interview' : ''}. CVs from Gmail or Google Drive arrive the same way through n8n (<a href="${X.base}/settings/hook">Automation key</a>).</p></div>
+      <label class="btn primary" for="anycv">Choose CVs</label><input type="file" id="anycv" multiple accept=".pdf,.docx,.jpg,.jpeg,.png" hidden><ul class="hlist" id="anyres"></ul></section>
     <div class="hjobs">${r.jobs.map(j => `<a class="hjob" href="${X.base}/recruit/${j.id}"><div><b>${esc(j.title)}</b><small>${esc([j.dept, j.location, j.job_type].filter(Boolean).join(' · '))}</small></div>
       ${pill(j.status === 'open' ? 'Open' : j.status === 'draft' ? 'Draft' : 'Closed', j.status === 'open' ? 'good' : '')}<div class="hjn"><b>${j.applicants}</b><span>applicants</span></div>${j.new_count ? `<span class="pill act">${j.new_count} new</span>` : ''}</a>`).join('')
       || '<div class="empty">No jobs yet. Post your first job and share the careers link.</div>'}</div>`;
   bindCopy();
+  $('#anycv').onchange = async () => {
+    const ul = $('#anyres'), files = [...$('#anycv').files].slice(0, 50); ul.innerHTML = '';
+    for (const file of files) {
+      const li = document.createElement('li'); li.innerHTML = `<span class="hdot info"></span><div>${esc(file.name)} <span class="muted small">reading…</span></div>`; ul.appendChild(li);
+      try {
+        if (file.size > 1200000) throw new Error('larger than 1.2 MB');
+        const x = await X.api('recruit/import', { method: 'POST', body: { source: 'hr', cv: { name: file.name, type: file.type || (/\.docx$/i.test(file.name) ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' : ''), data: await fileToB64(file) } } });
+        if (x.duplicate) li.innerHTML = `<span class="hdot"></span><div>${esc(file.name)} <span class="muted small">already here as ${esc(x.name)}</span></div>`;
+        else { const a = x.applicant; li.innerHTML = `<span class="hdot ${a.stage === 'rejected' ? 'bad' : ['shortlisted', 'interview'].includes(a.stage) ? 'good' : 'info'}"></span><div><a href="${X.base}/recruit/applicant/${a.id}"><b>${esc(a.name)}</b></a> → <b>${esc(x.job.title)}</b> <span class="score ${scoreTone(a.score)}">${a.score ?? '-'}</span> <span class="muted small">${esc(STG[a.stage])}${x.route && x.route.reason ? ' · ' + esc(x.route.reason) : ''}</span></div>`; }
+      } catch (e) { li.innerHTML = `<span class="hdot bad"></span><div>${esc(file.name)} <span class="error">${esc(e.message)}</span></div>`; }
+    }
+    toast('Done. Refresh to see the counts.');
+  };
 }
 const bindCopy = () => $$('[data-copy]').forEach(b => b.onclick = async () => { try { await navigator.clipboard.writeText(b.dataset.copy); toast('Link copied'); } catch (e) { prompt('Copy this link:', b.dataset.copy); } });
 function jobForm(id, j = { job_type: 'Full-time', status: 'open' }) {
@@ -442,7 +466,7 @@ function jobBoard(el, r) {
       ${list.map(a => `<a class="kcard" href="${X.base}/recruit/applicant/${a.id}"><div class="kt"><b>${esc(a.name)}</b>${a.score != null ? `<span class="score ${scoreTone(a.score)}" title="AI score">${a.score}</span>` : ''}</div>
         <small>${esc(a.current_role || '')}${a.experience ? ` · ${a.experience} yrs` : ''}</small>${a.ai && a.ai.summary ? `<p>${esc(a.ai.summary.slice(0, 110))}${a.ai.summary.length > 110 ? '…' : ''}</p>` : ''}
         <small class="ksrc">${esc(a.source === 'careers' ? 'Careers page' : SRC[a.source] || 'Added by HR')}${a.email ? '' : ' · <b class="bad">no email</b>'}</small>
-        ${a.stage === 'interview' && a.interview.date ? `<small class="kd">📅 ${esc(DS(a.interview.date))} ${esc(a.interview.time)}</small>` : ''}${a.stage === 'offer' && a.offer.status ? `<small class="kd">Offer ${esc(a.offer.status)}</small>` : ''}</a>`).join('') || '<p class="muted small">None</p>'}</section>`; }).join('')}</div>`;
+        ${a.stage === 'interview' && a.interview.date ? `<small class="kd">📅 ${esc(DS(a.interview.date))} ${esc(a.interview.time)}${a.interview.round > 1 ? ' · round ' + a.interview.round : ''}</small>` : ''}${a.stage === 'offer' && a.offer.status ? `<small class="kd">Offer ${esc(a.offer.status)}</small>` : ''}</a>`).join('') || '<p class="muted small">None</p>'}</section>`; }).join('')}</div>`;
   bindCopy();
   $('#adda').onclick = () => {
     $('#af2').innerHTML = `<form class="hform hcard soft" id="apf"><h3>Add one applicant</h3>
@@ -554,7 +578,8 @@ async function applicant(id, view) {
         ${(ai.questions || []).length ? `<h4>Suggested interview questions</h4><ol>${ai.questions.map(x => `<li>${esc(x)}</li>`).join('')}</ol>` : ''}
         <div class="row-end"><button class="btn small" id="rs">Screen again</button></div></section>
       <section class="hcard"><h3>Next step</h3><div id="act"></div>
-        ${iv.date ? `<div class="hbox"><b>Interview</b> ${esc(D(iv.date))} at ${esc(iv.time)} · ${esc(iv.mode || '')}${iv.where ? ' · ' + esc(iv.where) : ''}${iv.rating ? `<br>Rating ${'★'.repeat(iv.rating)}${'☆'.repeat(5 - iv.rating)} by ${esc(iv.by || '')}: ${esc(iv.feedback || '')}` : ''}</div>` : ''}
+        ${(iv.history || []).map(h => `<div class="hbox"><b>Round ${h.round}</b> ${esc(D(h.date))} · ${esc(h.result || 'done')}${h.rating ? ` · ${'★'.repeat(h.rating)}${'☆'.repeat(5 - h.rating)}` : ''}${h.feedback ? ': ' + esc(h.feedback) : ''}</div>`).join('')}
+        ${iv.date ? `<div class="hbox"><b>Interview${iv.round ? ' round ' + iv.round : ''}</b> ${esc(D(iv.date))} at ${esc(iv.time)} · ${esc(iv.mode || '')}${iv.where ? ' · ' + esc(iv.where) : ''}${iv.rating ? `<br>Rating ${'★'.repeat(iv.rating)}${'☆'.repeat(5 - iv.rating)} by ${esc(iv.by || '')}: ${esc(iv.feedback || '')}` : ''}</div>` : ''}
         ${of.sent_at ? `<div class="hbox"><b>Offer</b> ${esc(of.designation)} · joins ${esc(D(of.join_date))} · basic ${cur(of.basic)} · ${pill(of.status, of.status === 'accepted' ? 'good' : of.status === 'declined' ? 'bad' : 'info')}${of.answer_note ? `<br>“${esc(of.answer_note)}”` : ''}</div>` : ''}
         ${a.cover ? `<h4>Cover note</h4><p class="pre">${esc(a.cover)}</p>` : ''}
         <h4>Notes</h4><textarea id="nt" rows="3" aria-label="Notes">${esc(a.notes)}</textarea><div class="row-end"><button class="btn small" id="sn">Save notes</button></div></section>
@@ -634,20 +659,23 @@ async function runView(id) {
   const r = await X.api('payroll/' + id), x = r.run, t = x.totals, draft = x.status === 'draft';
   X.v.innerHTML = `<a class="muted small" href="${X.base}/payroll">← Payroll</a>
     ${head('Payroll · ' + esc(monthName(x.month)), pill(...RUN[x.status]).replace(/^/, '') + (x.approved_at ? ` approved ${fmtDate(x.approved_at)}` : '') + (x.paid_at ? ` · paid ${fmtDate(x.paid_at)}` : ''),
-      `${draft ? '<button class="btn" id="rf">Refresh from attendance</button><button class="btn ghost danger" id="del">Delete draft</button><button class="btn primary" id="ap">Approve & email payslips</button>' : ''}
-       ${x.status === 'approved' ? '<button class="btn primary" id="pd">Mark as paid</button>' : ''}<a class="btn" href="${X.raw}payroll/${x.id}/bank.csv">Salary sheet (CSV)</a>`)}
+      `${draft ? '<button class="btn" id="rf">Refresh from attendance</button><button class="btn ghost danger" id="del">Delete draft</button><button class="btn primary" id="ap">Approve payroll</button>' : ''}
+       ${x.status === 'approved' ? '<button class="btn primary" id="pd">Mark as paid</button>' : ''}<button class="btn" id="rep">${x.reported_at ? 'Send report again' : 'Send report'}</button><a class="btn" href="${X.raw}payroll/${x.id}/bank.csv">Salary sheet (CSV)</a>`)}
+    <p class="muted small" style="margin:-6px 0 14px">${X.S.payroll_recipients.length ? `The report goes to: ${X.S.payroll_recipients.map(esc).join(', ')}` : `Choose who gets the payroll report in <a href="${X.base}/settings">Settings → Payroll</a>`}${x.reported_at ? ` · last sent ${fmtDateTime(x.reported_at)}` : ''}. Employees get their payslip only when you send it.</p>
     <div class="hkpis">${[['People', t.people], ['Gross', cur(t.gross)], ['Deductions', cur(t.deductions)], ['Net pay', cur(t.net)]].map(([l, v]) => `<div class="hk"><span>${l}</span><b>${v}</b></div>`).join('')}</div>
     <section class="hcard flush"><div class="scroll"><table class="t"><thead><tr><th>Employee</th><th>Paid days</th><th class="n">Gross</th><th class="n">Deductions</th><th class="n">Net pay</th><th></th></tr></thead><tbody>
       ${r.slips.map(s => { const d = s.data.days || {}; return `<tr><td><b>${esc(s.name)}</b><div class="muted small">${esc(s.code)} · ${esc(s.dept || '')}</div></td>
         <td>${Math.round((d.workdays - d.unpaid_days) * 10) / 10} / ${d.workdays}${d.unpaid_days ? `<div class="muted small">${d.unpaid_days} unpaid: ${[d.absent && d.absent + ' absent', d.half && d.half + ' half day', d.late_deduct_days && d.late + ' late', d.unpaid_leave && d.unpaid_leave + ' unpaid leave', (d.workdays - d.employed_workdays) && (d.workdays - d.employed_workdays) + ' not employed'].filter(Boolean).join(', ')}</div>` : ''}</td>
         <td class="n">${cur(s.gross)}</td><td class="n">${cur(s.deductions)}</td><td class="n"><b>${cur(s.net)}</b></td>
-        <td class="n"><a class="btn small" href="${X.base}/payroll/slip/${s.id}">Payslip</a>${draft ? ` <button class="btn small" data-adj="${s.employee_id}">Bonus / deduction</button>` : ''}</td></tr>
+        <td class="n nowrap"><a class="btn small" href="${X.base}/payroll/slip/${s.id}">Payslip</a>${draft ? ` <button class="btn small" data-adj="${s.employee_id}">Bonus / deduction</button>` : ` <button class="btn small ${s.requested_at ? 'primary' : ''}" data-send="${s.id}" title="${s.requested_at ? 'Asked for it' : ''}">${s.released ? 'Send again' : s.requested_at ? 'Asked: send payslip' : 'Send payslip'}</button>`}</td></tr>
         ${draft ? `<tr class="adjrow" id="adj${s.employee_id}" hidden><td colspan="6"></td></tr>` : ''}`; }).join('') || '<tr><td colspan="6" class="muted">No employees in this month.</td></tr>'}
     </tbody></table></div></section>`;
   const b = (id2, fn) => { const el = $('#' + id2); if (el) el.onclick = () => busy(el, fn); };
   b('rf', async () => { try { await X.api(`payroll/${id}/refresh`, { method: 'POST' }); toast('Updated from the latest attendance and leave'); runView(id); } catch (e) { toast(e.message); } });
   b('del', async () => { if (!confirm('Delete this draft?')) return; try { await X.api('payroll/' + id, { method: 'DELETE' }); go('payroll'); } catch (e) { toast(e.message); } });
-  b('ap', async () => { if (!confirm(`Approve payroll for ${monthName(x.month)}? Payslips are emailed to employees and can no longer be changed.`)) return; try { const y = await X.api(`payroll/${id}/approve`, { method: 'POST' }); toast(`Approved. ${y.emailed} payslips emailed.`); runView(id); } catch (e) { toast(e.message); } });
+  b('ap', async () => { if (!confirm(`Approve payroll for ${monthName(x.month)}? It can no longer be changed. Nothing is emailed to employees.`)) return; try { await X.api(`payroll/${id}/approve`, { method: 'POST' }); toast('Approved and saved'); runView(id); } catch (e) { toast(e.message); } });
+  b('rep', async () => { try { const y = await X.api(`payroll/${id}/report`, { method: 'POST' }); toast(`Report ${y.held ? 'saved in the Outbox (test mode)' : 'sent'} to ${y.to.length} ${y.to.length === 1 ? 'person' : 'people'}`); runView(id); } catch (e) { toast(e.message); } });
+  $$('[data-send]').forEach(btn => btn.onclick = () => busy(btn, async () => { try { const y = await X.api(`payslips/${btn.dataset.send}/send`, { method: 'POST' }); toast(y.held ? 'Payslip saved in the Outbox (test mode); the employee can now see it in the app' : 'Payslip sent'); runView(id); } catch (e) { toast(e.message); } }));
   b('pd', async () => { try { await X.api(`payroll/${id}/paid`, { method: 'POST' }); toast('Marked as paid'); runView(id); } catch (e) { toast(e.message); } });
   $$('[data-adj]').forEach(btn => btn.onclick = () => {
     const eid = btn.dataset.adj, row = $('#adj' + eid), s = r.slips.find(z => String(z.employee_id) === eid);
@@ -730,11 +758,13 @@ async function reports() {
 // ================================================================ teams
 async function teams() {
   const [r, em] = await Promise.all([X.api('teams'), X.api('employees')]);
-  const people = em.employees.filter(e => e.status !== 'exited');
-  X.v.innerHTML = `${head('Teams', 'Each team has a lead who sees the team in the app and approves its leave. Put people in a team from their profile (Department).', '<button class="btn primary" id="addt">Add a team</button>')}
+  const people = em.employees.filter(e => e.status !== 'exited'), rosterType = X.S.leave_types.some(t => t.kind === 'roster');
+  X.v.innerHTML = `${head('Teams', 'Each team can have up to 3 leads. Leads see the team in the app and approve its leave. Put people in a team from their profile (Department).', '<button class="btn primary" id="addt">Add a team</button>')}
     <div class="hteams">${r.teams.map(t => `<section class="hcard hteam">
       <div class="tt"><h3>${esc(t.name)}</h3><span class="muted small">${t.members} ${t.members === 1 ? 'person' : 'people'}</span></div>
-      <label class="field"><span class="lab">Team lead</span><select data-lead="${esc(t.name)}"><option value="">No lead</option>${people.filter(e => e.dept === t.name || (t.lead && e.id === t.lead.id)).concat(people.filter(e => e.dept !== t.name)).map(e => opt(e.id, `${e.name}${e.dept !== t.name ? ' (' + (e.dept || 'no team') + ')' : ''}`, t.lead && t.lead.id)).join('')}</select></label>
+      <div class="field"><span class="lab">Team leads (up to 3)</span><div class="leadchips">${t.leads.map(l => `<span class="chip on">${esc(l.name)}<button type="button" class="cx" data-unlead="${esc(t.name)}" data-id="${l.id}" aria-label="Remove ${esc(l.name)}">×</button></span>`).join('') || '<span class="muted small">No lead yet</span>'}</div>
+        ${t.leads.length < 3 ? `<select data-lead="${esc(t.name)}" aria-label="Add a team lead"><option value="">+ Add a lead…</option>${people.filter(e => !t.leads.some(l => l.id === e.id)).sort((x, y) => (y.dept === t.name) - (x.dept === t.name)).map(e => opt(e.id, `${e.name}${e.dept !== t.name ? ' (' + (e.dept || 'no team') + ')' : ''}`)).join('')}</select>` : ''}</div>
+      ${rosterType ? `<label class="check"><input type="checkbox" data-roster="${esc(t.name)}" ${t.roster ? 'checked' : ''} ${X.S.roster.on ? '' : 'disabled'}> Roster leave for this team${X.S.roster.on ? '' : ' (turn the rule on in Settings)'}</label>` : ''}
       <div class="tstats"><div><b>${t.today.checked_in}</b><span>in today</span></div><div class="${t.today.late ? 'warn' : ''}"><b>${t.today.late}</b><span>late</span></div><div class="${t.today.absent ? 'bad' : ''}"><b>${t.today.absent}</b><span>absent</span></div><div><b>${t.today.on_leave}</b><span>on leave</span></div></div>
       <ul class="tlist"><li><span>Attendance this month</span><b>${t.month.rate == null ? '-' : t.month.rate + '%'}</b></li><li><span>Late days this month</span><b>${t.month.late || 0}</b></li><li><span>Leave waiting</span><b>${t.pending_leave}</b></li><li><span>Open jobs</span><b>${t.open_jobs}</b></li>${r.payroll_month ? `<li><span>Net pay, ${esc(monthName(r.payroll_month))}</span><b>${cur(t.payroll_net)}</b></li>` : ''}</ul>
       <div class="row"><button class="btn small" data-rep="${esc(t.name)}">Team report</button><button class="btn small ghost" data-att="${esc(t.name)}">Attendance</button><button class="btn small ghost" data-lv="${esc(t.name)}">Leave</button></div></section>`).join('') || '<div class="empty">No teams yet. Add your first team, for example Sales, Marketing or Admin.</div>'}</div>`;
@@ -743,8 +773,13 @@ async function teams() {
     if (X.S.departments.includes(n)) return toast('That team already exists.');
     try { X.S = (await X.api('settings', { method: 'PUT', body: { departments: [...X.S.departments, n] } })).settings; toast('Team added'); teams(); } catch (e) { toast(e.message); }
   };
-  $$('[data-lead]', X.v).forEach(sel => sel.onchange = async () => {
-    try { X.S = (await X.api('settings', { method: 'PUT', body: { team_leads: { ...X.S.team_leads, [sel.dataset.lead]: Number(sel.value) || 0 } } })).settings; toast(sel.value ? 'Team lead saved' : 'Team lead removed'); } catch (e) { toast(e.message); }
+  const saveLeads = async (team, ids, msg) => { try { X.S = (await X.api('settings', { method: 'PUT', body: { team_leads: { [team]: ids } } })).settings; toast(msg); teams(); } catch (e) { toast(e.message); } };
+  $$('[data-lead]', X.v).forEach(sel => sel.onchange = () => { if (!sel.value) return; saveLeads(sel.dataset.lead, [...(X.S.team_leads[sel.dataset.lead] || []), Number(sel.value)], 'Team lead added'); });
+  $$('[data-unlead]', X.v).forEach(b => b.onclick = () => saveLeads(b.dataset.unlead, (X.S.team_leads[b.dataset.unlead] || []).filter(x => x !== Number(b.dataset.id)), 'Team lead removed'));
+  $$('[data-roster]', X.v).forEach(c => c.onchange = async () => {
+    const all0 = r.teams.map(t => t.name), cur0 = X.S.roster.teams.length ? X.S.roster.teams : all0;
+    const next = c.checked ? [...new Set([...cur0, c.dataset.roster])] : cur0.filter(x => x !== c.dataset.roster);
+    try { X.S = (await X.api('settings', { method: 'PUT', body: { roster: { teams: next.length === all0.length ? [] : next.length ? next : ['(none)'] } } })).settings; toast(c.checked ? 'Roster leave on for ' + c.dataset.roster : 'Roster leave off for ' + c.dataset.roster); } catch (e) { toast(e.message); }
   });
   const pick = (t, h) => { X.team = t; try { sessionStorage.setItem(TEAMKEY, t); } catch (e) {} go(h); };
   $$('[data-rep]', X.v).forEach(b => b.onclick = () => pick(b.dataset.rep, 'reports'));
@@ -788,11 +823,20 @@ async function settings(p = []) {
             <label class="check"><input type="checkbox" name="ci_branch" ${S.checkin.allow_branch ? 'checked' : ''}> Allow “Branch visit” check-in</label></div>
         </div></div></section>
       <section class="section"><header><h2>Holidays</h2><p>Not counted as work days; nobody needs leave for them.</p></header>${rowsEd('hol', S.holidays, [['date', 'Date', 'date'], ['name', 'Holiday', 'text']], { date: '', name: '' })}</section>
-      <section class="section"><header><h2>Leave types</h2><p>Days per year. 0 = no fixed limit. Unpaid leave is deducted from salary.</p></header>${rowsEd('lt', S.leave_types, [['name', 'Name', 'text'], ['days', 'Days / year', 'number'], ['paid', 'Paid', 'bool'], ['carry', 'Carry unused to next year', 'bool']], { name: '', days: 0, paid: true, carry: false })}</section>
+      <section class="section" id="leave"><header><h2>Leave types</h2><p>Days per year are deducted as people take leave. 0 = no fixed limit. Unpaid leave is deducted from salary. <b>Alternate</b> and <b>Roster</b> leave are earned, not given.</p></header><div class="stack">
+        ${rowsEd('lt', S.leave_types, [['name', 'Name', 'text'], ['kind', 'How it works', 'lkind'], ['days', 'Days / year', 'number'], ['paid', 'Paid', 'bool'], ['carry', 'Carry unused to next year', 'bool']], { name: '', kind: 'normal', days: 0, paid: true, carry: false })}
+        <div class="row"><button type="button" class="btn small ghost" id="addAlt">+ Alternate leave</button><button type="button" class="btn small ghost" id="addRos">+ Roster leave</button></div>
+        <label class="check"><input type="checkbox" name="prorate" ${S.prorate_first_year ? 'checked' : ''}> In the joining year, give leave only for the months left (otherwise the full year from day one)</label>
+        <div class="hcard soft"><h3 class="sub" style="margin-top:0">Roster leave rule</h3>
+          <label class="check"><input type="checkbox" name="ro_on" ${S.roster.on ? 'checked' : ''}> On: an employee earns roster leave when they came on time on every work day of a run in the month before</label>
+          <div class="grid3">${field('Work days in a row on time', 'ro_streak', S.roster.streak, { type: 'number', attrs: 'min="3" max="31"' })}${field('Days of roster leave earned', 'ro_days', S.roster.days, { type: 'number', attrs: 'min="0.5" max="5" step="0.5"' })}
+            <p class="muted small" style="align-self:end">Counts only after probation. Choose the teams on the <a href="${X.base}/teams">Teams</a> page (none chosen = every team).</p></div></div></div></section>
       <section class="section"><header><h2>Payroll</h2><p>Allowances and deductions apply to everyone; % is of basic salary.</p></header><div class="stack">
         <div class="grid3">${field('Pay day (day of month)', 'pay_day', S.payroll.pay_day, { type: 'number', attrs: 'min="1" max="28"', hint: '1–10 pays the previous month' })}
           <label class="check" style="align-self:end"><input type="checkbox" name="auto_draft" ${S.payroll.auto_draft ? 'checked' : ''}> Prepare a draft 3 days before pay day</label>
           <label class="check" style="align-self:end"><input type="checkbox" name="leave_encashment" ${S.payroll.leave_encashment ? 'checked' : ''}> Pay unused annual leave at exit</label></div>
+        <div class="grid2">${area('Payroll report goes to (one per line)', 'pay_to', S.payroll_recipients.join('\n'), { ph: 'CEO <ceo@company.com>\ncfo@company.com\naccounts@company.com', hint: 'only these people get the payroll report; employees don’t' })}
+          <div class="stack"><label class="check"><input type="checkbox" name="pay_app" ${S.payslips_in_app ? 'checked' : ''}> Employees see their payslip in the app as soon as payroll is approved</label><p class="muted small">Off: an employee asks for a payslip in the app, and HR sends it with one click.</p></div></div>
         <h3 class="sub">Allowances</h3>${rowsEd('comp', S.payroll.components, [['name', 'Name', 'text'], ['type', 'Type', 'sel'], ['value', 'Value', 'number']], { name: '', type: 'percent', value: 0 })}
         <h3 class="sub">Deductions</h3>${rowsEd('ded', S.payroll.deductions, [['name', 'Name', 'text'], ['type', 'Type', 'sel'], ['value', 'Value', 'number']], { name: '', type: 'percent', value: 0 })}
         <div class="grid3"><label class="field"><span class="lab">Income tax</span><select name="tax_type">${opt('none', 'No tax deduction', S.payroll.tax.type)}${opt('percent', 'Flat % of gross', S.payroll.tax.type)}${opt('slabs', 'Yearly slabs', S.payroll.tax.type)}</select></label>
@@ -812,6 +856,18 @@ async function settings(p = []) {
         <label class="check"><input type="checkbox" name="celebrate" ${S.celebrate ? 'checked' : ''}> Send birthday and work-anniversary wishes</label></div></section>
       <section class="section" id="fb"><header><h2>Job posting</h2><p>Connect your Facebook page to post jobs from the dashboard. Create a page access token in Meta for Developers (Graph API Explorer → your page → <code>pages_manage_posts</code>).</p></header><div class="stack">
         <div class="grid2">${field('Facebook page ID', 'fb_page', S.facebook.page_id, { ph: '1234567890' })}${field('Page access token', 'fb_token', S.facebook.token, { type: 'password', hint: S.facebook.token ? 'saved; leave as is to keep it' : '' })}</div></div></section>
+      <section class="section" id="recruitauto"><header><h2>Recruitment on autopilot</h2><p>HR only adds the position and job description, then answers three updates by email. Everything else runs by itself.</p></header><div class="stack">
+        <label class="check"><input type="checkbox" name="ra_iv" ${S.recruit.auto_interview ? 'checked' : ''}> Book an interview slot for every shortlisted candidate and email the invite</label>
+        <div class="grid3"><div class="field"><span class="lab">Interview days</span><div class="wdays">${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map((d, i) => `<label class="check"><input type="checkbox" name="ra_day" value="${i}" ${S.recruit.slot_days.includes(i) ? 'checked' : ''}> ${d}</label>`).join('')}</div></div>
+          ${field('Interview times (comma separated)', 'ra_times', S.recruit.slot_times.join(', '), { ph: '11:00, 15:00' })}${field('Interview rounds', 'ra_rounds', S.recruit.rounds, { type: 'number', attrs: 'min="1" max="4"' })}</div>
+        <div class="grid2"><label class="field"><span class="lab">Interview type</span><select name="ra_mode">${['In person', 'Video call', 'Phone call'].map(m => opt(m, m, S.recruit.mode)).join('')}</select></label>${field('Where / meeting link', 'ra_where', S.recruit.where, { ph: 'Head office, House 12, Road 5, Gulshan' })}</div>
+        <label class="check"><input type="checkbox" name="ra_dayend" ${S.recruit.day_end_report ? 'checked' : ''}> At the end of each interview day, email HR one-click buttons: next round / selected / not selected</label>
+        <div class="grid2">${area('New joiner checklist (emailed to HR and accounts when someone is hired)', 'ra_mat', S.recruit.materials.join('\n'))}${field('Accounts email', 'ra_acc', S.recruit.accounts_email, { type: 'email', hint: 'gets the checklist too' })}</div></div></section>
+      <section class="section" id="hook"><header><h2>Automation key</h2><p>For your n8n workflows: CVs from Gmail or Google Drive, and LinkedIn candidates from Apify, come in through this address.</p></header><div class="stack">
+        <div class="hcopy"><span>Address</span><code>${esc(r.hook.url)}</code><button type="button" class="btn small" data-copy="${esc(r.hook.url)}">Copy</button></div>
+        <div class="hcopy"><span>Key (header X-HR-Key)</span><code id="hk">${esc(r.hook.key.slice(0, 6))}••••••••</code><button type="button" class="btn small" data-copy="${esc(r.hook.key)}">Copy key</button><button type="button" class="btn small ghost" id="hkNew">Make a new key</button></div></div></section>
+      <section class="section"><header><h2>Employee profiles</h2></header><div class="stack">
+        <label class="check"><input type="checkbox" name="self_edit" ${S.employee_self_edit ? 'checked' : ''}> Employees can fill in their own profile once (photo, blood group, NID, LinkedIn, bank, emergency contact). After that only HR can change it.</label></div></section>
       <section class="section"><header><h2>Letter templates</h2><p>Placeholders: {name} {designation} {dept} {company} {join_date} {date} {salary} {probation_months} {office_hours} {manager} {code} {last_day}</p></header><div class="stack">
         ${area('Appointment letter (sent when you hire)', 'l_appointment', S.letters.appointment, { cls: 'tall' })}${area('Offer letter', 'l_offer', S.letters.offer, { cls: 'tall' })}${area('Experience letter', 'l_experience', S.letters.experience, { cls: 'tall' })}</div></section>
       <div class="savebar">${errLine('sErr')}<button class="btn primary">Save settings</button></div></form>`;
@@ -833,7 +889,11 @@ async function settings(p = []) {
     }, e => { b.disabled = false; b.textContent = '📍 Use my current location'; toast('Location was not shared: ' + e.message); }, { enableHighAccuracy: true, timeout: 20000 });
   };
   $('#myip').onclick = ev => { const ip = ev.target.dataset.ip; if (!ip) return toast('Your IP could not be read.'); const t = f.elements.ci_ips; if (!t.value.split('\n').includes(ip)) t.value = (t.value.trim() ? t.value.trim() + '\n' : '') + ip; };
-  const anchor = { fb: '#fb', attendance: '#attapp', brand: '#brand', testing: '#testing' }[p[0]];
+  const LK = [['name', 'Name', 'text'], ['kind', 'How it works', 'lkind'], ['days', 'Days / year', 'number'], ['paid', 'Paid', 'bool'], ['carry', 'Carry unused to next year', 'bool']];
+  $('#addAlt').onclick = () => $('#lt').insertAdjacentHTML('beforeend', ledRow(LK, { name: 'Alternate leave', kind: 'alternate', days: 0, paid: true }));
+  $('#addRos').onclick = () => $('#lt').insertAdjacentHTML('beforeend', ledRow(LK, { name: 'Roster leave', kind: 'roster', days: 0, paid: true }));
+  $('#hkNew').onclick = ev => busy(ev.target, async () => { if (!confirm('Make a new key? Your n8n workflows must use the new key afterwards.')) return; try { await X.api('settings/hook-key', { method: 'POST' }); toast('New key made'); settings(['hook']); } catch (er) { toast(er.message); } });
+  const anchor = { fb: '#fb', attendance: '#attapp', brand: '#brand', testing: '#testing', leave: '#leave', recruit: '#recruitauto', hook: '#hook' }[p[0]];
   if (anchor) setTimeout(() => $(anchor).scrollIntoView({ block: 'start' }), 50);
   f.onsubmit = async ev => {
     ev.preventDefault(); const e = f.elements, v = n => e[n].value, ck = n => e[n].checked;
@@ -842,6 +902,8 @@ async function settings(p = []) {
       payroll: { pay_day: v('pay_day'), auto_draft: ck('auto_draft'), leave_encashment: ck('leave_encashment'), components: ledRead('comp'), deductions: ledRead('ded'),
         tax: { type: v('tax_type'), value: v('tax_value'), slabs: ledRead('slab') }, absent_deduction: ck('absent_deduction'), late_count: v('late_count'), late_days: v('late_days') },
       probation_months: v('probation_months'), notice_days: v('notice_days'), ai_shortlist: v('ai_shortlist'), onboarding: v('onboarding'), offboarding: v('offboarding'), careers_intro: v('careers_intro'),
+      prorate_first_year: ck('prorate'), roster: { on: ck('ro_on'), streak: v('ro_streak'), days: v('ro_days') }, payroll_recipients: v('pay_to'), payslips_in_app: ck('pay_app'), employee_self_edit: ck('self_edit'),
+      recruit: { auto_interview: ck('ra_iv'), slot_days: $$('[name=ra_day]:checked', f).map(x => +x.value), slot_times: v('ra_times').split(/[,\s]+/).filter(Boolean), rounds: v('ra_rounds'), mode: v('ra_mode'), where: v('ra_where'), day_end_report: ck('ra_dayend'), materials: v('ra_mat'), accounts_email: v('ra_acc') },
       hr_email: v('hr_email'), webhook: v('webhook'), notify_candidates: ck('notify_candidates'), notify_shortlist: ck('notify_shortlist'), auto_regret: ck('auto_regret'), celebrate: ck('celebrate'),
       letters: { offer: v('l_offer'), appointment: v('l_appointment'), experience: v('l_experience') },
       checkin: { mode: v('ci_mode'), require_location: ck('ci_loc'), require_ip: ck('ci_ip'), allow_field: ck('ci_field'), allow_branch: ck('ci_branch'), offices: ledRead('offices'), ips: v('ci_ips') },
@@ -867,6 +929,7 @@ async function outbox(id) {
 function ledRow(cols, it) {
   return `<div class="lrow" data-key="${esc(it.key || '')}">${cols.map(([k, l, t]) => t === 'bool' ? `<label class="check"><input type="checkbox" data-k="${k}" ${it[k] ? 'checked' : ''}> ${l}</label>`
     : t === 'sel' ? `<label class="field"><span class="lab">${l}</span><select data-k="${k}">${opt('percent', '% of basic', it[k])}${opt('fixed', 'Fixed amount', it[k])}</select></label>`
+    : t === 'lkind' ? `<label class="field"><span class="lab">${l}</span><select data-k="${k}">${opt('normal', 'Days per year', it[k])}${opt('alternate', 'Alternate (earned on weekends/holidays worked)', it[k])}${opt('roster', 'Roster (earned by on-time streak)', it[k])}</select></label>`
     : t === 'coord' ? `<label class="field"><span class="lab">${l}</span><input type="text" data-k="${k}" data-coord inputmode="decimal" value="${esc(it[k] ?? '')}"></label>`
     : `<label class="field"><span class="lab">${l}</span><input data-k="${k}" type="${t}" value="${esc(it[k] ?? '')}" ${t === 'number' ? 'step="any" min="0"' : ''}></label>`).join('')}<button type="button" class="icon-x" data-delrow aria-label="Remove">×</button></div>`;
 }

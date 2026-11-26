@@ -1,7 +1,7 @@
 /* Public careers page: /careers#/<company>, /careers#/<company>/<job>, /careers#/offer/<token> */
 (() => {
 'use strict';
-const { $, esc, makeApi, busy, field, area } = UI;
+const { $, $$, esc, makeApi, busy, field, area } = UI;
 const app = $('#app');
 const api = makeApi('/api/careers', () => {});
 const D = s => s ? new Date(s + 'T00:00:00Z').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }) : '';
@@ -25,6 +25,7 @@ async function route() {
   window.scrollTo(0, 0);
   try {
     if (p[0] === 'offer' && p[1]) return await offer(p[1]);
+    if (p[0] === 'join' && p[1]) return await join(p[1]);
     if (p[0]) await brand(p[0]);
     if (p[0] && p[1]) return await job(p[0], p[1]);
     if (p[0]) return await list(p[0]);
@@ -67,6 +68,37 @@ async function job(code, id) {
         f.outerHTML = `<div class="cr-body" style="margin-top:16px;text-align:center"><h2>Thank you, ${esc(v.name.split(' ')[0])}!</h2><p class="muted">Your application for ${esc(j.title)} has been sent. ${esc(r.company)} will contact you by email.</p></div>`;
       } catch (e) { $('#err').textContent = e.message; }
     });
+  };
+}
+// New joiner: upload the signed joining letter, NID, photo and certificates
+async function join(token) {
+  const r = await api('/join/' + encodeURIComponent(token));
+  await brand(r.code);
+  document.title = `Joining documents · ${r.company}`;
+  const has = k => r.sent.includes(k);
+  const row = (k, req) => `<label class="field"><span class="lab">${esc(r.kinds[k])}${req ? ' *' : ''}${has(k) ? ' ✓ received' : ''}</span><input type="file" data-kind="${k}" accept=".pdf,.jpg,.jpeg,.png${k === 'photo' ? '' : ',.docx'}" ${k === 'certificates' || k === 'other' ? 'multiple' : ''}></label>`;
+  app.innerHTML = `<div class="cr"><div class="cr-hero">${logo()}<span class="eyebrow-pill">${esc(r.company)}</span><h1>Welcome, ${esc(r.name.split(' ')[0])}</h1>
+      <p>Please upload your documents before you join as ${esc(r.designation || '')} on ${esc(D(r.join_date))}. Each file up to 1.2 MB (the photo up to 400 KB).</p></div>
+    <form class="cr-body cr-form" id="jf" novalidate>
+      ${row('joining_letter', !has('joining_letter'))}${row('nid')}${row('photo')}${row('certificates')}${row('other')}
+      <div class="grid2"><label class="field"><span class="lab">Blood group</span><select name="blood_group"><option value="">Choose…</option>${['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map(x => `<option>${x}</option>`).join('')}</select></label>
+        <label class="field"><span class="lab">NID number</span><input name="nid" inputmode="numeric"></label></div>
+      <label class="field"><span class="lab">Emergency contact</span><input name="emergency" placeholder="Name, relation, phone"></label>
+      <span class="error" id="jErr" role="alert"></span><button class="btn primary big">Send documents</button></form></div>`;
+  const f = $('#jf');
+  f.onsubmit = async ev => {
+    ev.preventDefault(); $('#jErr').textContent = '';
+    const btn = $('button', f); btn.disabled = true; btn.textContent = 'Uploading…';
+    try {
+      const files = [];
+      for (const inp of $$('input[type=file]', f)) for (const fl of inp.files) {
+        if (fl.size > (inp.dataset.kind === 'photo' ? 400000 : 1200000)) throw new Error(`${fl.name} is too large.`);
+        files.push({ kind: inp.dataset.kind, name: fl.name, type: fl.type || (/\.docx$/i.test(fl.name) ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' : ''), data: await new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(String(fr.result).split(',')[1]); fr.onerror = rej; fr.readAsDataURL(fl); }) });
+      }
+      const v = Object.fromEntries(new FormData(f));
+      await api('/join/' + encodeURIComponent(token), { method: 'POST', body: { files, blood_group: v.blood_group, nid: v.nid, emergency: v.emergency } });
+      app.innerHTML = `<div class="cr"><div class="cr-hero">${logo()}<h1>Thank you!</h1><p>HR has your documents. See you on ${esc(D(r.join_date))}.</p></div></div>`;
+    } catch (e) { $('#jErr').textContent = e.message; btn.disabled = false; btn.textContent = 'Send documents'; }
   };
 }
 async function offer(token) {

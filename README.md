@@ -173,6 +173,35 @@ Eta ekta **product** (Admin → Products e "AI HR Automation" naam e auto toiri 
 - Employee profile → **Set app password**: HR sets the password and gives it to the employee directly.
 - HR Settings → **Try it with demo data** → "Add demo data". This adds 8 demo employees in 4 teams (with leads), this month's attendance, today's check-ins, leave requests and a job with applicants. Every demo employee's password is `demo1234`. "Remove demo data" deletes it all in one click (real data is not touched).
 
+
+### HR v4: leave rules, teams, payroll report, recruitment on autopilot
+
+**Leave**
+- The yearly leave (e.g. Annual 14) is fully available from the first day, and is deducted as leave is taken. To prorate in the joining year, tick Settings → Leave types → "In the joining year…".
+- **Alternate leave:** 1 day earned for every weekend or holiday worked (half a day for a half day).
+- **Roster leave:** earned when an employee came on time on N work days in a row (default 10) in the previous month. It counts only after probation, and only from the month the company started recording attendance. Turn the rule on in Settings; choose which teams get it on the Teams page.
+
+**Teams:** up to 3 leads per team.
+
+**Employee profile:** photo, blood group, NID and LinkedIn. The employee can fill these in from the app **once**; after that only HR can change them (HR can use "Allow one more edit").
+
+**Payroll**
+- "Approve payroll" only saves the payroll; no email goes to employees.
+- "Send report" emails the whole payroll (team totals plus everyone) only to the people in Settings → Payroll → "Payroll report goes to".
+- Employees press "Ask for payslip" in the app; HR is notified and sends that one payslip with "Send payslip".
+
+**Recruitment on autopilot** (Settings → Recruitment on autopilot)
+1. HR posts the job and JD.
+2. CVs come in by email (n8n HR 3 watches Gmail), a Google Drive folder (HR 3), or are dropped in Recruitment → "Drop CVs for any position". Each CV goes to the best-matching open position automatically, then is screened and scored.
+3. Shortlisted candidates automatically get the first free interview slot (days/times from Settings) and an email invite.
+4. At 7 PM on the interview day HR gets an email with three buttons per candidate: **Next round** (next slot booked and emailed), **Selected: hire** (designation, joining date and salary → the employee is created and gets the appointment letter, the app link and a link to upload the joining documents), **Not selected** (polite email).
+5. On hire, the **new joiner checklist** (laptop, ID card…) goes to HR and the Accounts email, and is added as tasks.
+6. The new joiner uploads the signed joining letter, NID, photo and certificates from the link → they land in the employee profile.
+7. LinkedIn: n8n HR 4 uses Apify (`harvestapi~linkedin-profile-search`) to find matching people (open to work first) every morning → Job → Find candidates.
+
+**Automation key:** HR Settings → Automation key gives the Address and Key (header `X-HR-Key`) the n8n workflows use: `GET …/jobs`, `POST …/cv`, `POST …/prospects`.
+**Evening cron:** `/api/cron/hr-evening` (HR 1 Daily Runner calls it at 7 PM).
+
 ## 6. SEO, alt text, speed
 
 - **Alt text:** Media Library te protiti image er niche "Alt text" likho (Enter/bahire click korle save). Cover field er pashe **Cover alt** field ache; khali thakle Media Library er alt, tarpor page heading use hoy. Blog body te image dite **Copy HTML** chapo, alt soho ashe.

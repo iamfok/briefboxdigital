@@ -1,5 +1,5 @@
 // The employee app page (used by /team and /team/<company code>).
-const TEAM_V = '20261126e';
+const TEAM_V = '20261126f';
 export function TeamShell() {
   const V = TEAM_V;
   return (

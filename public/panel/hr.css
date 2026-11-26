@@ -294,3 +294,18 @@ tr.tot td { font-weight: 700; border-top: 2px solid var(--line); }
 .branded .pl .btn.primary, .branded .btn.primary { background: var(--accent); box-shadow: 0 6px 18px -8px color-mix(in srgb, var(--accent) 60%, transparent); }
 .branded .tm-me { background: var(--accent); }
 .branded .eyebrow-pill { color: var(--accent); }
+
+/* ---------- v4 ---------- */
+.leadchips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.leadchips .chip { display: inline-flex; align-items: center; gap: 4px; cursor: default; }
+.leadchips .cx { border: 0; background: none; color: inherit; font-size: 16px; line-height: 1; cursor: pointer; padding: 0 2px; }
+.hav.ph { object-fit: cover; padding: 0; background: #eee; }
+.hphoto { position: relative; cursor: pointer; display: inline-block; }
+.hphoto .hpcam { position: absolute; left: 50%; bottom: -6px; transform: translateX(-50%); background: #fff; border: 1px solid var(--line); border-radius: 99px; font-size: 11px; font-weight: 600; padding: 1px 8px; color: var(--ink-2); }
+.hdrop { display: grid; grid-template-columns: 1fr auto; gap: 10px 16px; align-items: center; margin-bottom: 18px; }
+.hdrop ul { grid-column: 1 / -1; margin: 0; } .hdrop ul:empty { display: none; }
+.tm-photo { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; }
+.tm-locked { background: #f6f5fb; border-radius: 12px; padding: 12px 14px; font-size: 13.5px; color: var(--ink-2); }
+.tm-req { font-size: 13px; }
+.pl input[type=tel] { width: 100%; font: inherit; padding: 11px 13px; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+.pl input[type=file] { font: inherit; font-size: 14px; }
