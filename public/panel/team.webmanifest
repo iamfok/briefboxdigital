@@ -1,0 +1,22 @@
+{
+  "id": "/team",
+  "name": "Briefbox Team",
+  "short_name": "Team",
+  "description": "Check in, apply for leave and see your payslips.",
+  "start_url": "/team#/",
+  "scope": "/team",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f6f5fb",
+  "theme_color": "#f6f5fb",
+  "categories": ["business", "productivity"],
+  "icons": [
+    { "src": "/panel/app-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/panel/app-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/panel/app-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Check in", "url": "/team#/", "icons": [{ "src": "/panel/app-192.png", "sizes": "192x192" }] },
+    { "name": "Apply for leave", "url": "/team#/leave", "icons": [{ "src": "/panel/app-192.png", "sizes": "192x192" }] }
+  ]
+}

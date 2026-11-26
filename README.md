@@ -102,6 +102,54 @@ Niche "Recent emails" e protiti email sent/failed dekha jay. Email fail korleo o
 
 Client portal e **Invoices** page ache: protiti invoice/receipt khule **Print or save PDF** kora jay.
 
+## 5b. AI HR Automation (built-in, n8n lage na)
+
+Eta ekta **product** (Admin → Products e "AI HR Automation" naam e auto toiri hoy). Approve korle n8n workflow banay na, shob kaj website er bhitorei hoy.
+
+**Setup (ekbar):**
+1. Admin → Products → **AI HR Automation** → **Plans** add koro (dam, meyad, ar *limit = koto jon employee*). "Shown to clients" on koro.
+2. Admin → Connection → **AI (Gemini)**: Google AI Studio theke API key → paste → **Save and test**. Key na dileo chole, tokhon CV keyword diye score hoy.
+3. Email (section 5) set thakte hobe, karon candidate ar employee der email jay.
+4. Daily cron (section 4 er expiry URL) HR o chalay: interview reminder, birthday/anniversary, notice shesh hole exit, payday er 3 din age payroll draft, HR digest. Shudhu HR chalate: `/api/cron/hr` (same `X-Cron-Key`).
+
+**Client er flow:** portal → Add an automation → AI HR Automation → plan → payment → tumi approve → **HR dashboard** tab khule jay.
+- **Settings:** company, departments, workweek, holidays, leave types, salary components, tax, late rule, payday, onboarding/offboarding checklist.
+- **Recruitment:** job post → careers page e apply → AI CV score → shortlist → interview (email + reminder) → offer letter (candidate link e accept) → hire = employee.
+- **Employees:** profile, documents, notes, probation confirm, invite to employee portal, exit (notice → final settlement, experience letter).
+- **Attendance:** shudhu exception mark koro (absent/late/half); baki shob present. Leave, holiday, weekend nije boshe.
+- **Leave:** employee apply → manager/HR approve → balance auto.
+- **Payroll:** month select → attendance theke salary auto → bonus/deduction → Approve = payslip email + bank sheet CSV.
+- **Policies & notices, Reports** (CSV export).
+
+**Links:**
+- Employee portal: `/team` (invite email theke password set kore login).
+- Careers page: `/careers#/<client_id>` (client er company code).
+
+**n8n e pathate chaile:** client er Settings e webhook URL dile protiti event (applicant, employee, leave, payroll, notice, attendance) shekhane POST hoy.
+
+
+### HR v2: employee app, candidate sourcing, appointment letter
+
+**Employee app** (`/team`, phone-first, installable):
+- HR Settings → **Attendance app** → "Employees check in on the app". Add the office/branch location ("Use my current location" while standing in the office) and, if you want, the office Wi-Fi IP.
+- **Check in at office** only works inside the office radius (and on the office IP, if that check is on). **Field visit / Branch visit** work from anywhere, but need a note and the location is saved.
+- Check-out is always allowed; if it happens outside the office, HR sees it in red.
+- Late is marked automatically (office start + late minutes). A work day with no check-in counts as absent from the day the app was switched on.
+- Leave: full day or half day, balance shown on screen.
+- Profile: details, documents, appointment letter, bank, password.
+
+**Putting it on Play Store / App Store** (one app for every client company):
+1. Go to pwabuilder.com and enter `https://briefboxdigital.com/team`, then Package.
+2. **Android:** in the options turn **Location delegation** on and set package name `com.briefboxdigital.team`. Download the package. Upload the `.aab` to Play Console (developer account $25, one time). Copy the SHA-256 shown in Play Console → App integrity and paste it in Admin → Connection → "Employee app on Play Store".
+3. **iPhone:** download the iOS package from PWABuilder. You need a Mac with Xcode and an Apple Developer account ($99/year). Add a location permission line (NSLocationWhenInUseUsageDescription) in Info.plist, then upload. Apple sometimes rejects plain website apps, so test it on TestFlight first.
+4. Until the apps are live, employees can open `/team` in Chrome/Safari → "Add to Home screen". It works the same way.
+
+**Recruitment** (on the job page, 4 tabs):
+- **Post the job:** AI writes LinkedIn, Facebook and Bdjobs posts. Facebook can post straight to the page (page ID + token in HR Settings → Job posting). LinkedIn uses a share button. Bdjobs has no API, so you copy/paste the text. Webhook event `job.published` goes to n8n.
+- **Find candidates:** searches public LinkedIn profiles ("Open to work" first) and Facebook posts with a Serper.dev key (Admin → Connection). AI ranks them. Each person has a ready "Copy message" and a status (Contacted, Replied, CV received). There are 4 searches per job per day; "Search again every morning" runs it automatically.
+- **Import CVs:** upload many CVs (PDF/Word/photo) from Bdjobs, Facebook, email and so on. AI reads the name, email and phone, gives a score and shortlists. Every candidate gets an email: shortlisted, or received (an automatic "not selected" is optional).
+- **Hire:** after the interview HR clicks Hire → designation, department, joining date, salary, manager. The employee profile is created and the **appointment letter** is emailed with an app setup link. Template: Settings → Letters.
+
 ## 6. SEO, alt text, speed
 
 - **Alt text:** Media Library te protiti image er niche "Alt text" likho (Enter/bahire click korle save). Cover field er pashe **Cover alt** field ache; khali thakle Media Library er alt, tarpor page heading use hoy. Blog body te image dite **Copy HTML** chapo, alt soho ashe.
@@ -126,8 +174,8 @@ Client portal e **Invoices** page ache: protiti invoice/receipt khule **Print or
 app/            pages (Next.js App Router), /api, /media, sitemap.xml, robots.txt
 components/     website er HTML blocks (site.jsx, views.jsx)
 content/        built-in content (database na thakle eta dekhay)
-lib/            database, content, login, Lead Engine, API
+lib/            database, content, login, Lead Engine (le/), HR (hr/), API
 public/assets/  logo, style.css, app.js (cookie banner, tracking, forms, hero animation), cover images
-public/panel/   admin ar portal er interface
+public/panel/   admin, portal, HR dashboard (hr.js), employee portal (team.js), careers (careers.js)
 ```
 Local e chalate: `npm install` → `npm run dev` → http://localhost:3000

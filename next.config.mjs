@@ -19,7 +19,7 @@ const security = [
   { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
   { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
   { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains' },
-  { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(), payment=()' },
+  { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(self), payment=()' },
   ...(process.env.NODE_ENV === 'production' ? [{ key: 'Content-Security-Policy', value: csp }] : []),
 ];
 const privateArea = [
@@ -31,6 +31,10 @@ const privateArea = [
 const nextConfig = {
   poweredByHeader: false,
   trailingSlash: false,
+  async rewrites() {
+    // Play Store app (Trusted Web Activity) proof of ownership; values are set in Admin → Connection
+    return [{ source: '/.well-known/assetlinks.json', destination: '/api/assetlinks' }];
+  },
   async headers() {
     return [
       { source: '/:path*', headers: security },
@@ -39,6 +43,9 @@ const nextConfig = {
       { source: '/admin/:path*', headers: privateArea },
       { source: '/portal', headers: privateArea },
       { source: '/portal/:path*', headers: privateArea },
+      { source: '/team', headers: privateArea },
+      { source: '/team/:path*', headers: privateArea },
+      { source: '/team-sw.js', headers: [{ key: 'Cache-Control', value: 'no-cache' }, { key: 'Service-Worker-Allowed', value: '/team' }] },
       { source: '/api/:path*', headers: privateArea },
     ];
   },

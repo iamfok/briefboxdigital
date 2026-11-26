@@ -525,6 +525,23 @@ async function renderConnection() {
       const r = await api('/connection/test', { method: 'POST', body: {} }); out.textContent = r.message; out.className = r.ok ? 'small' : 'error'; }
     catch (err) { out.textContent = err.message; out.className = 'error'; }
   });
+  renderAi();
+}
+// AI key used by the HR automation (CV screening, HR assistant).
+async function renderAi() {
+  const box = document.createElement('div'); W0.append(box);
+  let m; try { m = await api('/ai'); } catch (e) { box.innerHTML = errBox(e); return; }
+  box.innerHTML = `<form id="aif"><section class="section"><header><h2>AI (Google Gemini)</h2><p>Used by the HR automation to read CVs and answer employees’ policy questions. Without a key, simple keyword rules are used. Get a key at aistudio.google.com → Get API key.</p></header>
+    <div class="stack"><div class="grid2">${field('Gemini API key', 'key', m.key, { type: 'password', hint: 'stored encrypted', attrs: 'autocomplete="off"' })}${field('Model', 'model', m.model, { hint: 'default gemini-2.5-flash' })}</div><p class="small" id="aiout"></p></div></section>
+    <section class="section"><header><h2>Candidate search (HR)</h2><p>Lets HR clients find matching people on LinkedIn and Facebook from a job. Uses a Serper.dev key (2,500 free searches; then pay as you go). Each client can search 4 times a day per job.</p></header>
+    <div class="stack">${field('Serper.dev API key', 'search_key', m.search_key, { type: 'password', hint: 'serper.dev → API key. Stored encrypted.', attrs: 'autocomplete="off"' })}</div></section>
+    <section class="section"><header><h2>Employee app on Play Store</h2><p>After you build the Android app with PWABuilder, paste its package name and SHA-256 fingerprint here. The app then opens full screen, without an address bar.</p></header>
+    <div class="stack"><div class="grid2">${field('Package name', 'android_pkg', m.android_pkg, { ph: 'com.briefboxdigital.team' })}${field('SHA-256 fingerprint(s)', 'android_sha', m.android_sha, { ph: 'AB:CD:…', hint: 'from PWABuilder (assetlinks.json) or Play Console → App integrity. Several: separate with a comma.' })}</div>
+    <p class="small muted">Check: <a href="/.well-known/assetlinks.json" target="_blank" rel="noopener">/.well-known/assetlinks.json</a></p></div></section>
+    <div class="savebar" style="position:static"><button class="btn" type="button" id="aiT">Save and test</button><button class="btn primary" type="submit">Save AI settings</button></div></form>`;
+  const save = () => api('/ai', { method: 'PUT', body: Object.fromEntries(new FormData($('#aif'))) });
+  $('#aif').onsubmit = async e => { e.preventDefault(); await busy($('#aif button[type=submit]'), async () => { try { await save(); toast('AI settings saved'); } catch (err) { toast(err.message); } }); };
+  $('#aiT').onclick = e => busy(e.target, async () => { const o = $('#aiout'); try { await save(); const r = await api('/ai/test', { method: 'POST', body: {} }); o.textContent = 'Working. The AI replied: ' + r.reply; o.className = 'small'; } catch (err) { o.textContent = err.message; o.className = 'error'; } });
 }
 
 // view: overview | clients | new | a | s | payments | products | product | billing | connection
