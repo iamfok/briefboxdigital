@@ -33,7 +33,7 @@ async function route() {
   if (page === 'info') { shell('info'); return renderInfo(); }
   if (page === 'invoices') { shell('invoices'); return renderInvoices(); }
   if (page === 'invoice' && parts[1]) { shell('invoices'); return renderInvoice(parts[1]); }
-  if (page === 'a' && parts[1]) return renderAutomation(parts[1], parts[2]);
+  if (page === 'a' && parts[1]) return renderAutomation(parts[1], parts[2], parts.slice(3));
   shell('home'); renderHome();
 }
 
@@ -249,15 +249,16 @@ function renderInfo() {
 }
 
 // ------------------------------------------------------------------ one automation
-async function renderAutomation(id, tab) {
+async function renderAutomation(id, tab, rest = []) {
   shell('auto', id);
   const main = $('#main'); main.innerHTML = skel(4);
   let b, view = null;
   try { b = await api(`/me/s/${id}`); } catch (e) { if (!e.auth) main.innerHTML = `<p class="error">${esc(e.message)}</p>`; return; }
   const s = b.sub, p = b.product, base = `#/a/${s.id}`;
-  if (!['settings', 'dashboard', 'subscription'].includes(tab)) { location.replace(`${base}/${s.stage === 'live' ? 'dashboard' : 'settings'}`); return; }
+  const isHr = p.kind === 'hr', hrOn = isHr && s.stage === 'live' && ['trial', 'active', 'grace'].includes(s.sub_status);
+  const tabs = isHr ? (hrOn ? [['hr', 'HR dashboard'], ['subscription', 'Subscription']] : [['settings', 'Setup'], ['subscription', 'Subscription']]) : [['settings', 'Settings'], ['dashboard', 'Dashboard'], ['subscription', 'Subscription']];
+  if (!tabs.some(t => t[0] === tab)) { location.replace(`${base}/${tabs[0][0] === 'settings' && s.stage === 'live' && !isHr ? 'dashboard' : tabs[0][0]}`); return; }
   if (s.stage !== 'live') { try { view = await api(`/me/s/${s.id}/settings`); } catch (e) { view = null; } }
-  const tabs = [['settings', 'Settings'], ['dashboard', 'Dashboard'], ['subscription', 'Subscription']];
   main.innerHTML = `
     <div class="autohead"><a href="#/" class="muted small">← Overview</a>
       <div class="ahrow"><span class="aic big" aria-hidden="true">${esc(p.icon || '⚙️')}</span><div><h1>${esc(p.name)}</h1>${p.short ? `<p class="muted">${esc(p.short)}</p>` : ''}</div></div>
@@ -270,6 +271,8 @@ async function renderAutomation(id, tab) {
   const rm = $('#rm');
   if (rm) rm.onclick = async () => { if (!confirm(`Remove ${p.name} from your account?`)) return; try { await api(`/me/s/${s.id}`, { method: 'DELETE' }); toast('Removed'); location.hash = '#/'; } catch (e) { toast(e.message); } };
   const el = $('#tab');
+  if (tab === 'hr') { $('.autohead', main).classList.add('compact'); return window.HRApp.mount(el, { api, sub: s, parts: rest }); }
+  if (tab === 'settings' && isHr) { el.innerHTML = `<section class="section"><header><h2>Nothing to connect</h2><p>The HR automation runs inside Briefbox. Choose a plan on the Subscription tab. Once we approve it, your HR dashboard opens here: employees, attendance, leave, payroll, recruitment and policies.</p></header></section>`; return; }
   if (tab === 'settings') return tabSettings(el, s, p, view);
   if (tab === 'dashboard') return tabDashboard(el, s, p);
   return tabSubscription(el, s, p, b);

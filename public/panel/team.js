@@ -3,8 +3,21 @@
 'use strict';
 const { $, $$, esc, toast, makeApi, fmtDate, fmtDateTime, money, busy, field, area } = UI;
 const app = $('#app');
-const api = makeApi('/api/team', () => { state.me = null; if (!/^#\/(login|invite)/.test(location.hash)) location.hash = '#/login'; });
-const state = { me: null, install: null };
+// each company has its own app link: /team/<company code>
+const CODE = (location.pathname.match(/^\/team\/([a-z0-9_-]+)/i) || [])[1] || '';
+const api = makeApi('/api/team', () => { state.me = null; if (!/^#\/(login|invite)/.test(location.hash)) location.hash = '#/login'; }, CODE ? { 'X-Team-Code': CODE } : {});
+const state = { me: null, install: null, brand: null };
+function applyBrand(b) {
+  if (!b) return;
+  state.brand = b;
+  document.title = b.app_name || b.company || 'Employee app';
+  const c = /^#[0-9a-f]{6}$/i.test(b.color || '') ? b.color : '';
+  if (c) { document.body.classList.add('branded'); const r = app.style; r.setProperty('--accent', c); r.setProperty('--accent-soft', `color-mix(in srgb, ${c} 12%, #fff)`); r.setProperty('--grad', `linear-gradient(100deg, ${c}, color-mix(in srgb, ${c} 72%, #fff))`); r.setProperty('--data', c);
+    let m = document.querySelector('meta[name=theme-color]'); if (!m) { m = document.createElement('meta'); m.name = 'theme-color'; document.head.append(m); } m.content = '#f6f5fb'; }
+  const ap = document.querySelector('link[rel=apple-touch-icon]'); if (ap && b.logo) ap.href = b.logo;
+}
+const brandMark = (big) => { const b = state.brand || {}; return b.logo ? `<img class="tm-logo${big ? ' big' : ''}" src="${esc(b.logo)}" alt="">` : ''; };
+const appTitle = () => (state.brand && (state.brand.app_name || state.brand.company)) || 'Employee app';
 const D = s => { if (!s) return '-'; const d = new Date(s + 'T00:00:00Z'); return isNaN(d) ? s : d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }); };
 const DS = s => s ? new Date(s + 'T00:00:00Z').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' }) : '';
 const DW = s => s ? new Date(s + 'T00:00:00Z').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' }) : '';
@@ -28,13 +41,19 @@ const icon = k => `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" s
 if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('/team-sw.js', { scope: '/team' }).catch(() => {}));
 window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); state.install = e; const b = $('#inst'); if (b) b.hidden = false; });
 window.addEventListener('hashchange', route);
-route();
+(async () => {
+  if (CODE) { try { applyBrand(await api('/brand/' + CODE, { noAuthRedirect: true })); } catch (e) { app.innerHTML = `<div class="tm-auth"><form><h1>App not available</h1><p class="error">${esc(e.message)}</p></form></div>`; return; } }
+  route();
+})();
 
 async function route() {
   const p = location.hash.replace(/^#\/?/, '').split('/').filter(Boolean);
   if (p[0] === 'login') return login();
   if (p[0] === 'invite') return invite(p[1]);
-  try { state.me = await api('/me'); } catch (e) { if (!e.auth) app.innerHTML = `<div class="tm-auth"><form><h1>Employee app</h1><p class="error">${esc(e.message)}</p><a class="btn" href="#/login">Sign in again</a></form></div>`; return; }
+  try { state.me = await api('/me'); applyBrand({ code: state.me.company.code, company: state.me.company.name, app_name: state.me.company.app_name, color: state.me.company.color, logo: (state.brand || {}).logo || '' });
+    // signed in through the general link: move to the company's own link
+    if (!CODE && state.me.company.code) { location.replace(`/team/${state.me.company.code}${location.hash || '#/'}`); return; }
+  } catch (e) { if (!e.auth) app.innerHTML = `<div class="tm-auth"><form><h1>${esc(appTitle())}</h1><p class="error">${esc(e.message)}</p><a class="btn" href="#/login">Sign in again</a></form></div>`; return; }
   const page = p[0] || 'home';
   shell(page);
   const main = $('#main');
@@ -43,15 +62,15 @@ async function route() {
   window.scrollTo(0, 0);
 }
 function login() {
-  app.innerHTML = `<div class="tm-auth"><form novalidate><span class="eyebrow-pill">Employee app</span><h1>Sign in</h1><p class="muted">Use the email your HR team added for you.</p>
+  app.innerHTML = `<div class="tm-auth"><form novalidate>${brandMark(true)}<span class="eyebrow-pill">${esc(appTitle())}</span><h1>Sign in</h1><p class="muted">Use the email your HR team added for you.</p>
     ${field('Work email', 'email', '', { type: 'email', attrs: 'required autocomplete="email" inputmode="email"' })}${field('Password', 'password', '', { type: 'password', attrs: 'required autocomplete="current-password"' })}
     <span class="error" id="err" role="alert"></span><button class="btn primary big">Sign in</button><p class="muted small">No password yet? Open the link in the email HR sent you. Forgot it? Ask HR to send a new invite.</p></form></div>`;
   const f = $('form', app);
   f.onsubmit = async ev => { ev.preventDefault(); $('#err').textContent = ''; await busy($('button', f), async () => { try { await api('/login', { method: 'POST', body: Object.fromEntries(new FormData(f)), noAuthRedirect: true }); location.hash = '#/'; } catch (e) { $('#err').textContent = e.message; } }); };
 }
 async function invite(token) {
-  let x; try { x = await api('/invite/' + token, { noAuthRedirect: true }); } catch (e) { app.innerHTML = `<div class="tm-auth"><form><h1>Link expired</h1><p class="error">${esc(e.message)}</p><a class="btn" href="#/login">Sign in</a></form></div>`; return; }
-  app.innerHTML = `<div class="tm-auth"><form novalidate><span class="eyebrow-pill">${esc(x.company)}</span><h1>Welcome, ${esc(x.name.split(' ')[0])}</h1><p class="muted">Set a password for <b>${esc(x.email)}</b>. You will use it to sign in to the employee app.</p>
+  let x; try { x = await api('/invite/' + token, { noAuthRedirect: true }); if (!CODE && x.code) { location.replace(`/team/${x.code}#/invite/${token}`); return; } } catch (e) { app.innerHTML = `<div class="tm-auth"><form><h1>Link expired</h1><p class="error">${esc(e.message)}</p><a class="btn" href="#/login">Sign in</a></form></div>`; return; }
+  app.innerHTML = `<div class="tm-auth"><form novalidate>${brandMark(true)}<span class="eyebrow-pill">${esc(appTitle())}</span><h1>Welcome, ${esc(x.name.split(' ')[0])}</h1><p class="muted">Set a password for <b>${esc(x.email)}</b>. You will use it to sign in to the employee app.</p>
     ${field('New password', 'password', '', { type: 'password', hint: 'at least 8 characters, letters and numbers', attrs: 'required autocomplete="new-password"' })}
     <span class="error" id="err" role="alert"></span><button class="btn primary big">Set password and continue</button></form></div>`;
   const f = $('form', app);
@@ -60,11 +79,11 @@ async function invite(token) {
 function shell(page) {
   const m = state.me;
   const top = [['home', 'Home'], ['attendance', 'Attendance'], ['leave', 'Leave'], ['payslips', 'Payslips'], ['policies', 'Policies'], ['ask', 'Ask HR'], ['profile', 'My profile']];
-  if (m.is_manager) top.splice(3, 0, ['approvals', 'Team']);
+  if (m.is_manager) top.splice(3, 0, ['approvals', 'My team']);
   const tabs = [['home', 'Home'], ['attendance', 'Attendance'], ['leave', 'Leave'], ['payslips', 'Payslips'], ['more', 'More']];
   const curTab = ['payslip'].includes(page) ? 'payslips' : ['policies', 'ask', 'profile', 'approvals', 'letter'].includes(page) ? 'more' : page;
   const badge = m.pending_approvals ? `<span class="n">${m.pending_approvals}</span>` : '';
-  app.innerHTML = `<div class="tm"><header class="tm-top"><span class="co">${esc(m.company.name)}</span>
+  app.innerHTML = `<div class="tm"><header class="tm-top"><span class="co">${brandMark()}${esc(appTitle())}</span>
     <nav aria-label="App">${top.map(([k, l]) => `<a href="#/${k === 'home' ? '' : k}" ${k === page || (page === 'payslip' && k === 'payslips') ? 'aria-current="page"' : ''}>${l}${k === 'approvals' ? badge : ''}</a>`).join('')}<a href="#" class="out">Sign out</a></nav>
     <a class="tm-me" href="#/profile" aria-label="My profile">${esc(m.employee.name.split(' ').map(x => x[0]).slice(0, 2).join(''))}</a></header>
     <main id="main"></main>
@@ -252,7 +271,7 @@ async function letter(main) {
 async function more(main) {
   const m = state.me, ios = /iphone|ipad|ipod/i.test(navigator.userAgent), standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone;
   const items = [['profile', 'My profile', 'Job details, documents, bank and password'], ['policies', 'Company policies', m.policies_to_ack.length ? `${m.policies_to_ack.length} to accept` : 'Read the rules'], ['ask', 'Ask HR', 'Quick answers about leave and policies']];
-  if (m.is_manager) items.unshift(['approvals', 'Team approvals', m.pending_approvals ? `${m.pending_approvals} waiting for you` : 'Leave requests from your team']);
+  if (m.is_manager) items.unshift(['approvals', 'My team', m.pending_approvals ? `${m.pending_approvals} leave request${m.pending_approvals === 1 ? '' : 's'} waiting for you` : 'Who is in today, and leave requests']);
   main.innerHTML = `<div class="hhead"><div><h2>More</h2></div></div>
     <section class="hcard" style="margin-top:14px"><ul class="tm-list">${items.map(([k, l, s]) => `<li class="link"><a href="#/${k}"><div><b>${l}</b><small>${esc(s)}</small></div><div class="r">›</div></a></li>`).join('')}</ul></section>
     ${standalone ? '' : `<section class="hcard soft" style="margin-top:16px"><h3>Install the app</h3><p class="muted small">${ios ? 'On iPhone: tap the Share button in Safari, then <b>Add to Home Screen</b>.' : 'Add this app to your home screen for one-tap check-in.'}</p><button class="btn primary" id="inst" ${state.install ? '' : 'hidden'}>Install</button></section>`}
@@ -263,7 +282,10 @@ async function more(main) {
 }
 async function approvals(main) {
   const r = await api('/approvals');
-  main.innerHTML = `<div class="hhead"><div><h2>Team approvals</h2><p class="muted">Leave requests from ${r.team.map(t => esc(t.name)).join(', ') || 'your team'}.</p></div></div>
+  const T = { P: ['In', 'good'], L: ['Late', 'warn'], H: ['Half day', 'info'], A: ['Absent', 'bad'], LV: ['On leave', 'info'], HO: ['Holiday', ''], WE: ['Weekend', ''], '': ['Not in yet', ''] };
+  main.innerHTML = `<div class="hhead"><div><h2>My team</h2><p class="muted">${r.teams_led.length ? 'Team lead of ' + r.teams_led.map(esc).join(', ') + '. ' : ''}${r.team.length} people.</p></div></div>
+    <section class="hcard" style="margin-top:14px"><h3>Today</h3><ul class="tm-list">${r.today.map(x => `<li><div><b>${esc(x.name)}</b><small>${esc(x.designation || '')}${x.in_time ? ' · in ' + to12(x.in_time) : ''}${x.out_time ? ' – ' + to12(x.out_time) : ''}${x.kind && x.kind !== 'office' ? ' · ' + esc(KIND[x.kind]) + (x.place ? ': ' + esc(x.place) : '') : ''}</small></div><div class="r">${pill(...(T[x.code] || [x.label, '']))}</div></li>`).join('') || '<li class="muted">No one yet.</li>'}</ul></section>
+    <h3 style="margin:20px 0 0">Leave requests</h3>
     <section class="hcard" style="margin-top:14px">${r.leaves.length ? `<ul class="tm-list">${r.leaves.map(l => `<li><div><b>${esc(l.employee_name)}</b> · ${esc(l.type_name)}<small>${esc(DS(l.start_date))}${l.end_date !== l.start_date ? ' – ' + esc(D(l.end_date)) : ''} · ${l.half ? 'half day' : l.days + ' day' + (l.days === 1 ? '' : 's')}${l.reason ? ' · ' + esc(l.reason) : ''}</small></div>
       <div class="r">${l.status === 'pending' ? `<button class="btn small" data-d="${l.id}" data-ok="0">Decline</button><button class="btn small primary" data-d="${l.id}" data-ok="1">Approve</button>` : pill(...LV[l.status])}</div></li>`).join('')}</ul>` : '<p class="muted">No requests from your team.</p>'}</section>`;
   $$('[data-d]', main).forEach(b => b.onclick = () => busy(b, async () => {

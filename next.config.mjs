@@ -6,7 +6,7 @@ const csp = [
   "img-src 'self' data: blob: https:",
   "font-src 'self' data:",
   "connect-src 'self' https://formspree.io https://www.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com https://*.doubleclick.net https://www.google.com https://www.facebook.com https://connect.facebook.net",
-  "frame-src https://www.googletagmanager.com https://td.doubleclick.net https://calendar.google.com",
+  "frame-src 'self' https://www.googletagmanager.com https://td.doubleclick.net https://calendar.google.com",
   "form-action 'self' https://formspree.io",
   "base-uri 'self'",
   "object-src 'none'",

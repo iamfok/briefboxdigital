@@ -14,7 +14,7 @@ const STG = { new: 'New', shortlisted: 'Shortlisted', interview: 'Interview', of
 const RUN = { draft: ['Draft', 'warn'], approved: ['Approved', 'info'], paid: ['Paid', 'good'] };
 const ATT = { P: 'Present', L: 'Late', H: 'Half day', A: 'Absent' };
 const WD = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-const SECTIONS = [['overview', 'Overview'], ['recruit', 'Recruitment'], ['employees', 'Employees'], ['attendance', 'Attendance'], ['leave', 'Leave'], ['payroll', 'Payroll'], ['policies', 'Policies & notices'], ['reports', 'Reports'], ['settings', 'Settings']];
+const SECTIONS = [['overview', 'Overview'], ['recruit', 'Recruitment'], ['employees', 'Employees'], ['teams', 'Teams'], ['attendance', 'Attendance'], ['leave', 'Leave'], ['payroll', 'Payroll'], ['policies', 'Policies & notices'], ['reports', 'Reports'], ['settings', 'Settings']];
 const scoreTone = n => n == null ? '' : n >= 70 ? 'good' : n >= 45 ? 'info' : 'bad';
 const initials = n => String(n || '?').trim().split(/\s+/).slice(0, 2).map(x => x[0]).join('').toUpperCase();
 const av = n => `<span class="hav" aria-hidden="true">${esc(initials(n))}</span>`;
@@ -33,16 +33,22 @@ const monthName = m => new Date(m + '-01T00:00:00Z').toLocaleDateString('en-GB',
 const opt = (v, l, cur) => `<option value="${esc(v)}" ${String(v) === String(cur ?? '') ? 'selected' : ''}>${esc(l)}</option>`;
 
 let X = null; // { api, sid, base, el, S, cur }
+const TEAMKEY = 'hr-team';
+const teamQ = (sep = '?') => X.team ? `${sep}team=${encodeURIComponent(X.team)}` : '';
+const teamBar = (what) => `<div class="hteambar"><label>Team <select id="teamsel" aria-label="Team"><option value="">All teams</option>${X.S.departments.map(d => opt(d, d, X.team)).join('')}</select></label>${X.team ? `<span class="muted small">Showing ${esc(what)} for <b>${esc(X.team)}</b> only</span>` : ''}</div>`;
+const bindTeam = again => { const t = $('#teamsel'); if (t) t.onchange = () => { X.team = t.value; try { sessionStorage.setItem(TEAMKEY, X.team); } catch (e) {} again(); }; };
 
 window.HRApp = {
   async mount(el, { api, sub, parts }) {
-    X = { api: (p, o) => api(`/me/s/${sub.id}/hr/${p}`, o), raw: `/api/me/s/${sub.id}/hr/`, sid: sub.id, base: `#/a/${sub.id}/hr`, el, S: null };
+    let team0 = ''; try { team0 = sessionStorage.getItem(TEAMKEY) || ''; } catch (e) {}
+    X = { api: (p, o) => api(`/me/s/${sub.id}/hr/${p}`, o), raw: `/api/me/s/${sub.id}/hr/`, sid: sub.id, base: `#/a/${sub.id}/hr`, el, S: null, team: team0 };
     const section = SECTIONS.some(s => s[0] === parts[0]) ? parts[0] : 'overview';
     el.innerHTML = `<nav class="hnav" aria-label="HR">${SECTIONS.map(([k, l]) => `<a href="${X.base}/${k}" ${k === section ? 'aria-current="page"' : ''}>${l}</a>`).join('')}</nav><div id="hrv" class="hrv"><div class="skel"><div class="sk"></div><div class="sk"></div></div></div>`;
     X.v = $('#hrv', el);
     try {
       if (!X.S) X.S = (await X.api('settings')).settings;
-      await ({ overview, recruit, employees, attendance, leave, payroll, policies, reports, settings }[section])(parts.slice(1));
+      if (X.team && !X.S.departments.includes(X.team)) X.team = '';
+      await ({ overview, recruit, employees, teams, attendance, leave, payroll, policies, reports, settings }[section])(parts.slice(1));
     } catch (e) { if (!e.auth) X.v.innerHTML = `<div class="note bad"><b>Something went wrong.</b> ${esc(e.message)}</div>`; }
   },
 };
@@ -110,9 +116,9 @@ async function employees(p) {
   X.v.innerHTML = `${head('Employees', `${list.filter(e => e.status !== 'exited').length} people${r.limit ? ` · your plan covers ${r.limit}` : ''}`,
     `<a class="btn" href="${X.raw}employees.csv">Download CSV</a><a class="btn primary" href="${X.base}/employees/new">Add employee</a>`)}
     <div class="hfilters"><input type="search" id="q" placeholder="Search name, email, designation" aria-label="Search employees">
-      <select id="fd" aria-label="Department"><option value="">All departments</option>${[...new Set(list.map(e => e.dept).filter(Boolean))].map(d => opt(d, d)).join('')}</select>
+      <select id="fd" aria-label="Team"><option value="">All teams</option>${[...new Set([...X.S.departments, ...list.map(e => e.dept).filter(Boolean)])].map(d => opt(d, d, X.team)).join('')}</select>
       <select id="fs" aria-label="Status"><option value="">Current staff</option>${Object.entries(EMP).map(([k, v]) => opt(k, v[0])).join('')}<option value="all">Everyone</option></select></div>
-    <div class="hcard flush"><div class="scroll"><table class="t ht"><thead><tr><th>Name</th><th>Department</th><th>Joined</th><th>Status</th><th>Portal</th></tr></thead><tbody id="et"></tbody></table></div></div>`;
+    <div class="hcard flush"><div class="scroll"><table class="t ht"><thead><tr><th>Name</th><th>Team</th><th>Joined</th><th>Status</th><th>Portal</th></tr></thead><tbody id="et"></tbody></table></div></div>`;
   const draw = () => {
     const q = $('#q').value.toLowerCase(), fd = $('#fd').value, fs = $('#fs').value;
     const rows = list.filter(e => (!q || [e.name, e.email, e.designation, e.code].join(' ').toLowerCase().includes(q)) && (!fd || e.dept === fd) && (fs === 'all' || (fs ? e.status === fs : e.status !== 'exited')));
@@ -130,7 +136,7 @@ async function employeeForm(id, data) {
   X.v.innerHTML = `${head(id ? 'Edit ' + esc(e.name) : 'Add employee', id ? '' : 'Onboarding tasks are created automatically. Invite them to their portal after saving.')}
     <form id="ef" class="hform">
       <section class="section"><header><h2>Person</h2></header><div class="stack">
-        <div class="grid2">${field('Full name', 'name', e.name, { attrs: 'required' })}${field('Email', 'email', e.email, { type: 'email', hint: 'needed for the employee portal and payslips' })}</div>
+        <div class="grid2">${field('Full name', 'name', e.name, { attrs: 'required' })}${field('Email', 'email', e.email, { type: 'email', hint: 'needed for the employee app and payslips' })}</div>
         <div class="grid3">${field('Phone', 'phone', e.phone)}${field('Date of birth', 'dob', e.dob, { type: 'date' })}
           <label class="field"><span class="lab">Gender</span><select name="gender">${['', 'Female', 'Male', 'Other'].map(g => opt(g, g || 'Prefer not to say', e.gender)).join('')}</select></label></div>
         <div class="grid2">${area('Address', 'address', e.address)}${area('Emergency contact', 'emergency', e.emergency, { ph: 'Name, relation, phone' })}</div>
@@ -195,7 +201,8 @@ async function employeeView(id, tab) {
           ${e.status === 'probation' && e.probation_end ? `<span>Probation until ${esc(D(e.probation_end))}</span>` : ''}${e.status === 'notice' ? `<span>Last day ${esc(D(ex.last_day))}</span>` : ''}</p></div>
       <div class="row-end">
         ${e.status !== 'exited' ? `<a class="btn small" href="${X.base}/employees/${e.id}/edit">Edit</a>` : ''}
-        ${e.status !== 'exited' && e.email && !e.has_login ? `<button class="btn small" id="inv">${e.invited ? 'Send invite again' : 'Invite to portal'}</button>` : ''}
+        ${e.status !== 'exited' && e.email && !e.has_login ? `<button class="btn small" id="inv">${e.invited ? 'Send invite again' : 'Invite to the app'}</button>` : ''}
+        ${e.status !== 'exited' && e.email ? `<button class="btn small ghost" id="setpw">${e.has_login ? 'Reset app password' : 'Set app password'}</button>` : ''}
         ${e.status === 'probation' ? '<button class="btn small" id="conf">Confirm (end probation)</button>' : ''}
         ${e.status !== 'exited' ? `<a class="btn small" href="${X.base}/employees/${e.id}/letter-appointment">Appointment letter</a>` : ''}
         ${e.status === 'notice' || e.status === 'exited' ? `<a class="btn small" href="${X.base}/employees/${e.id}/letter">Experience letter</a>` : ''}
@@ -206,7 +213,9 @@ async function employeeView(id, tab) {
     <nav class="tabs subtabs">${tabs.map(([k, l]) => `<a href="${X.base}/employees/${e.id}/${k}" ${k === tab ? 'aria-current="page"' : ''}>${l}</a>`).join('')}</nav>
     <div id="et2"></div>`;
   const bind = (sel, fn) => { const b = $(sel); if (b) b.onclick = () => busy(b, fn); };
-  bind('#inv', async () => { try { const x = await X.api(`employees/${e.id}/invite`, { method: 'POST' }); if (x.emailed) toast('Invite emailed to ' + e.email); else { prompt('Email could not be sent (' + (x.email_error || 'email is off') + '). Copy this link and send it yourself:', x.link); } employeeView(id, tab); } catch (er) { toast(er.message); } });
+  bind('#inv', async () => { try { const x = await X.api(`employees/${e.id}/invite`, { method: 'POST' }); if (x.emailed) toast('Invite emailed to ' + e.email); else { prompt(x.held ? 'Test mode: the email is in the Outbox and was not sent. Copy the set-password link:' : 'Email could not be sent (' + (x.email_error || 'email is off') + '). Copy this link and send it yourself:', x.link); } employeeView(id, tab); } catch (er) { toast(er.message); } });
+  bind('#setpw', async () => { const pw = prompt(`Set an app password for ${e.name} (8+ characters, letters and numbers). Give it to them; they sign in with ${e.email}.`, ''); if (!pw) return;
+    try { const x = await X.api(`employees/${e.id}/password`, { method: 'POST', body: { password: pw } }); prompt('Password set. App link:', x.link); employeeView(id, tab); } catch (er) { toast(er.message); } });
   bind('#conf', async () => { if (!confirm(`Confirm ${e.name} as a permanent employee?`)) return; try { await X.api(`employees/${e.id}/confirm`, { method: 'POST' }); toast('Confirmed'); employeeView(id, tab); } catch (er) { toast(er.message); } });
   bind('#cex', async () => { if (!confirm('Cancel the exit and keep this employee?')) return; try { await X.api(`employees/${e.id}/cancel-exit`, { method: 'POST' }); toast('Exit cancelled'); employeeView(id, tab); } catch (er) { toast(er.message); } });
   const exb = $('#exit');
@@ -333,26 +342,28 @@ function leaveForm(box, emps, empId, after) {
 }
 async function leave(p) {
   const st = ['pending', 'approved', ''].includes(p[0] ?? 'pending') ? (p[0] ?? 'pending') : 'pending';
-  const [r, em] = await Promise.all([X.api('leaves' + (st ? '?status=' + st : '')), X.api('employees')]);
+  const [r, em] = await Promise.all([X.api('leaves' + (st ? '?status=' + st : '') + teamQ(st ? '&' : '?')), X.api('employees')]);
   X.v.innerHTML = `${head('Leave', 'Employees apply in their portal. Managers approve their team; you can approve anyone.', '<button class="btn primary" id="addl">Add leave for someone</button>')}
-    <div id="lf"></div>
+    ${teamBar('leave')}<div id="lf"></div>
     <nav class="hpills">${[['pending', 'Waiting'], ['approved', 'Approved'], ['all', 'All']].map(([k, l]) => `<a href="${X.base}/leave/${k === 'all' ? '' : k}" ${(k === 'all' ? '' : k) === st ? 'aria-current="page"' : ''}>${l}</a>`).join('')}</nav>
     <section class="hcard flush">${leaveTable(r.leaves)}</section>`;
   $('#addl').onclick = () => leaveForm($('#lf'), em.employees, '', () => leave(p));
   bindLeave(X.v, () => leave(p));
+  bindTeam(() => leave(p));
 }
 
 // ================================================================ attendance
 async function attendance(p) {
   if (p[0] === 'month') return attendanceMonth(p[1] || thisMonth());
   const date = /^\d{4}-\d{2}-\d{2}$/.test(p[0] || '') ? p[0] : today();
-  const r = await X.api('attendance?date=' + date);
+  const r = await X.api('attendance?date=' + date + teamQ('&'));
   const off = !r.workday;
   const app = X.S.checkin && X.S.checkin.mode === 'app';
   const where = x => { if (x.source !== 'app') return ''; const g = x.geo || {}, i = g.in || {}, o = g.out || {}; const map = q => q && q.lat != null ? ` <a href="https://maps.google.com/?q=${q.lat},${q.lng}" target="_blank" rel="noopener">map</a>` : '';
     return `<div class="appin">📱 ${x.kind === 'field' ? '<b>Field visit</b>' : x.kind === 'branch' ? '<b>Branch visit</b>' : 'Office'}${x.place ? ' · ' + esc(x.place) : ''}${x.kind === 'office' && i.distance != null ? ` · ${i.distance} m` : ''}${map(i)}${o.outside ? ` · <span class="bad">checked out outside${map(o)}</span>` : ''}</div>`; };
   X.v.innerHTML = `${head('Attendance', app ? 'Employees check in from the app: office check-in only works inside the office; field and branch visits need a note. No check-in on a past work day counts as absent. You can correct any day here.' : 'Mark only the exceptions: anyone left empty counts as present. Leave, holidays and weekends fill in by themselves.',
     `<a class="btn" href="${X.base}/attendance/month/${date.slice(0, 7)}">Month view</a>`)}
+    ${teamBar('attendance')}
     <div class="hdaybar"><a class="btn small" href="${X.base}/attendance/${addD(date, -1)}" aria-label="Previous day">‹</a><input type="date" id="dt" value="${date}" aria-label="Date"><a class="btn small" href="${X.base}/attendance/${addD(date, 1)}" aria-label="Next day">›</a>
       <b>${new Date(date + 'T00:00:00Z').toLocaleDateString('en-GB', { weekday: 'long', timeZone: 'UTC' })}</b>${off ? pill(r.holiday || 'Weekend', 'info') : ''}
       <span class="row-end"><button class="btn small" id="allp" ${off ? 'disabled' : ''}>Mark everyone present</button></span></div>
@@ -363,6 +374,7 @@ async function attendance(p) {
         <td>${locked ? '' : `<input name="n${x.employee.id}" value="${esc(x.note || '')}" aria-label="Note" placeholder="Optional">`}</td></tr>`; }).join('') || '<tr><td colspan="5" class="muted" style="padding:24px;text-align:center">No employees on this date.</td></tr>'}
     </tbody></table></div><div class="savebar">${errLine('aErr')}<button class="btn primary" ${off ? 'disabled' : ''}>Save attendance</button></div></form>`;
   $('#dt').onchange = ev => go('attendance/' + ev.target.value);
+  bindTeam(() => attendance(p));
   $('#allp').onclick = () => $$('#af tr[data-e]').forEach(tr => { const r2 = $('input[value="P"]', tr); if (r2 && !$('input:checked', tr)?.value) r2.checked = true; });
   $('#af').onsubmit = async ev => {
     ev.preventDefault();
@@ -371,7 +383,7 @@ async function attendance(p) {
   };
 }
 async function attendanceMonth(m) {
-  const r = await X.api('attendance/month?month=' + m);
+  const r = await X.api('attendance/month?month=' + m + teamQ('&'));
   const cls = c => ({ P: 'p', L: 'l', H: 'h', A: 'a', LV: 'lv', HO: 'ho', WE: 'we', '-': 'na', '': 'p0' }[c] || '');
   const short = d => ({ P: 'P', L: 'L', H: '½', A: 'A', LV: 'LV', HO: 'H', WE: '', '-': '', '': '·' }[d.code] ?? d.code);
   X.v.innerHTML = `${head('Attendance · ' + monthName(m), 'P present · L late · ½ half day · A absent · LV leave · H holiday · · not marked (counts as present)',
@@ -692,11 +704,12 @@ async function policies(p) {
 
 // ================================================================ reports
 async function reports() {
-  const r = await X.api('reports');
+  const r = await X.api('reports' + teamQ());
   const hb = (rows, label = x => x.k, val = x => x.n, fmt = v => v) => { const max = Math.max(1, ...rows.map(val)); return rows.length ? `<div class="hbars">${rows.map(x => `<div class="hb"><span>${esc(label(x))}</span><div><i style="width:${Math.round(val(x) / max * 100)}%"></i></div><b>${fmt(val(x))}</b></div>`).join('')}</div>` : '<p class="muted">No data yet.</p>'; };
   const last = r.payroll[r.payroll.length - 1];
   const maxF = Math.max(1, ...r.flow.map(f => Math.max(f.joined, f.left)));
-  X.v.innerHTML = `${head('Reports', 'Live numbers from your HR data.')}
+  X.v.innerHTML = `${head(X.team ? `${esc(X.team)} team report` : 'Reports', 'Live numbers from your HR data.', `<a class="btn" href="${X.raw}reports.csv${teamQ()}">Download attendance (CSV)</a>`)}
+    ${teamBar('the report')}
     <div class="hkpis">${[['Headcount', r.headcount], ['Attrition (12 months)', r.attrition + '%'], [`Attendance ${monthName(r.attendance.month).split(' ')[0]}`, r.attendance.rate == null ? '-' : r.attendance.rate + '%'], ['Last payroll', last ? cur(last.net || 0) : '-']].map(([l, v]) => `<div class="hk"><span>${l}</span><b>${v}</b></div>`).join('')}</div>
     <div class="hgrid">
       <section class="hcard"><h3>People by department</h3>${hb(r.by_dept)}</section>
@@ -707,21 +720,61 @@ async function reports() {
       <section class="hcard"><h3>Attendance this month</h3>${hb([{ k: 'Present days', n: r.attendance.present || 0 }, { k: 'Late', n: r.attendance.late || 0 }, { k: 'Absent', n: r.attendance.absent || 0 }, { k: 'Paid leave', n: r.attendance.paid_leave || 0 }, { k: 'Unpaid leave', n: r.attendance.unpaid_leave || 0 }])}</section>
       <section class="hcard"><h3>Recruitment</h3>${hb(['new', 'shortlisted', 'interview', 'offer', 'hired', 'rejected'].map(s => ({ k: STG[s], n: (r.funnel.find(f => f.stage === s) || {}).n || 0 })))}</section>
       <section class="hcard"><h3>Employment type</h3>${hb(r.by_type)}</section>
-    </div>`;
+    </div>
+    ${r.people ? `<section class="hcard flush" style="margin-top:16px"><div class="scroll"><table class="t"><thead><tr><th>${esc(X.team)} team, ${esc(monthName(r.attendance.month))}</th><th class="n">Work days</th><th class="n">Present</th><th class="n">Late</th><th class="n">Absent</th><th class="n">Leave</th></tr></thead><tbody>
+      ${r.people.map(x => `<tr class="link" data-href="${X.base}/employees/${x.id}"><td><b>${esc(x.name)}</b><div class="muted small">${esc(x.designation || '')}</div></td><td class="n">${x.employed_workdays}</td><td class="n">${x.present}</td><td class="n">${x.late}</td><td class="n">${x.absent}</td><td class="n">${x.paid_leave + x.unpaid_leave}</td></tr>`).join('') || '<tr><td colspan="6" class="muted">No one in this team.</td></tr>'}</tbody></table></div></section>` : ''}`;
+  bindTeam(reports);
+  $$('tr[data-href]', X.v).forEach(t => t.onclick = () => { location.hash = t.dataset.href; });
+}
+
+// ================================================================ teams
+async function teams() {
+  const [r, em] = await Promise.all([X.api('teams'), X.api('employees')]);
+  const people = em.employees.filter(e => e.status !== 'exited');
+  X.v.innerHTML = `${head('Teams', 'Each team has a lead who sees the team in the app and approves its leave. Put people in a team from their profile (Department).', '<button class="btn primary" id="addt">Add a team</button>')}
+    <div class="hteams">${r.teams.map(t => `<section class="hcard hteam">
+      <div class="tt"><h3>${esc(t.name)}</h3><span class="muted small">${t.members} ${t.members === 1 ? 'person' : 'people'}</span></div>
+      <label class="field"><span class="lab">Team lead</span><select data-lead="${esc(t.name)}"><option value="">No lead</option>${people.filter(e => e.dept === t.name || (t.lead && e.id === t.lead.id)).concat(people.filter(e => e.dept !== t.name)).map(e => opt(e.id, `${e.name}${e.dept !== t.name ? ' (' + (e.dept || 'no team') + ')' : ''}`, t.lead && t.lead.id)).join('')}</select></label>
+      <div class="tstats"><div><b>${t.today.checked_in}</b><span>in today</span></div><div class="${t.today.late ? 'warn' : ''}"><b>${t.today.late}</b><span>late</span></div><div class="${t.today.absent ? 'bad' : ''}"><b>${t.today.absent}</b><span>absent</span></div><div><b>${t.today.on_leave}</b><span>on leave</span></div></div>
+      <ul class="tlist"><li><span>Attendance this month</span><b>${t.month.rate == null ? '-' : t.month.rate + '%'}</b></li><li><span>Late days this month</span><b>${t.month.late || 0}</b></li><li><span>Leave waiting</span><b>${t.pending_leave}</b></li><li><span>Open jobs</span><b>${t.open_jobs}</b></li>${r.payroll_month ? `<li><span>Net pay, ${esc(monthName(r.payroll_month))}</span><b>${cur(t.payroll_net)}</b></li>` : ''}</ul>
+      <div class="row"><button class="btn small" data-rep="${esc(t.name)}">Team report</button><button class="btn small ghost" data-att="${esc(t.name)}">Attendance</button><button class="btn small ghost" data-lv="${esc(t.name)}">Leave</button></div></section>`).join('') || '<div class="empty">No teams yet. Add your first team, for example Sales, Marketing or Admin.</div>'}</div>`;
+  $('#addt').onclick = async () => {
+    const n = (prompt('Team name (for example Marketing):', '') || '').trim(); if (!n) return;
+    if (X.S.departments.includes(n)) return toast('That team already exists.');
+    try { X.S = (await X.api('settings', { method: 'PUT', body: { departments: [...X.S.departments, n] } })).settings; toast('Team added'); teams(); } catch (e) { toast(e.message); }
+  };
+  $$('[data-lead]', X.v).forEach(sel => sel.onchange = async () => {
+    try { X.S = (await X.api('settings', { method: 'PUT', body: { team_leads: { ...X.S.team_leads, [sel.dataset.lead]: Number(sel.value) || 0 } } })).settings; toast(sel.value ? 'Team lead saved' : 'Team lead removed'); } catch (e) { toast(e.message); }
+  });
+  const pick = (t, h) => { X.team = t; try { sessionStorage.setItem(TEAMKEY, t); } catch (e) {} go(h); };
+  $$('[data-rep]', X.v).forEach(b => b.onclick = () => pick(b.dataset.rep, 'reports'));
+  $$('[data-att]', X.v).forEach(b => b.onclick = () => pick(b.dataset.att, 'attendance'));
+  $$('[data-lv]', X.v).forEach(b => b.onclick = () => pick(b.dataset.lv, 'leave/'));
 }
 
 // ================================================================ settings
 async function settings(p = []) {
+  if (p[0] === 'outbox') return outbox(p[1]);
   const r = await X.api('settings'), S = r.settings;
   const rowsEd = (id, items, cols, blank) => `<div class="led" id="${id}" data-cols='${JSON.stringify(cols)}'>${items.map(it => ledRow(cols, it)).join('')}</div><button type="button" class="btn small" data-addrow="${id}" data-blank='${JSON.stringify(blank)}'>+ Add</button>`;
   X.v.innerHTML = `${head('HR settings', 'These rules drive attendance, leave, payroll and every automatic email.')}
-    <div class="hcopy"><span>Employee portal</span><code>${esc(r.team_url)}</code><button class="btn small" data-copy="${esc(r.team_url)}">Copy</button><span>Careers page</span><code>${esc(r.careers_url)}</code><button class="btn small" data-copy="${esc(r.careers_url)}">Copy</button></div>
+    ${r.mail_mode === 'test' ? `<div class="note warn">Test mode: emails are not sent. Read them, and open their links, in the <a href="${X.base}/settings/outbox">Outbox</a>.</div>` : ''}
+    <div class="hcopy"><span>Your employee app</span><code>${esc(r.team_url)}</code><button class="btn small" data-copy="${esc(r.team_url)}">Copy</button><span>Careers page</span><code>${esc(r.careers_url)}</code><button class="btn small" data-copy="${esc(r.careers_url)}">Copy</button></div>
     <form id="sf" class="hform">
       <section class="section"><header><h2>Work week</h2><p>Unmarked work days count as present.</p></header><div class="stack">
         <div class="field"><span class="lab">Work days</span><div class="wdays">${WD.map((d, i) => `<label class="check"><input type="checkbox" name="wd" value="${i}" ${S.work_days.includes(i) ? 'checked' : ''}> ${d}</label>`).join('')}</div></div>
         <div class="grid3">${field('Office starts', 'office_start', S.office_start, { type: 'time' })}${field('Office ends', 'office_end', S.office_end, { type: 'time' })}${field('Late after (minutes)', 'late_after_min', S.late_after_min, { type: 'number' })}</div>
         <div class="grid3">${field('Time zone', 'timezone', S.timezone, { hint: 'e.g. Asia/Dhaka, Europe/London' })}${field('Currency', 'currency', S.currency, { hint: 'BDT, USD, GBP…' })}</div>
-        ${area('Departments (one per line)', 'departments', S.departments.join('\n'))}</div></section>
+        ${area('Teams / departments (one per line)', 'departments', S.departments.join('\n'), { hint: 'set team leads on the Teams page' })}</div></section>
+      <section class="section" id="brand"><header><h2>Branding</h2><p>Your employees see your name, logo and colour in the app, on the careers page and in emails. Nothing else.</p></header><div class="stack">
+        <div class="grid3">${field('App name', 'b_name', S.brand.app_name, { ph: r.company, hint: 'shown on the phone home screen' })}<label class="field"><span class="lab">Brand colour</span><input type="color" name="b_color" value="${esc(S.brand.color || '#5b2be0')}"></label>
+          <label class="field"><span class="lab">Logo (square PNG, under 200 KB)</span><input type="file" name="b_logo" accept="image/png,image/jpeg,image/webp"></label></div>
+        <div class="brandprev" id="bprev"><span class="bp-logo">${r.logo_url ? `<img src="${esc(r.logo_url)}" alt="">` : ''}</span><b>${esc(S.brand.app_name || r.company)}</b><span class="bp-btn">Check in at office</span>${r.logo_url ? '<button type="button" class="btn small ghost" id="blrm">Remove logo</button>' : ''}</div></div></section>
+      <section class="section" id="testing"><header><h2>Try it with demo data</h2><p>Adds 8 demo employees in 4 teams with leads, this month’s attendance, today’s check-ins, leave and a job with applicants. Remove it all with one click before you go live.</p></header><div class="stack">
+        ${r.demo.on ? `<p>Demo data is on. Each demo employee signs in at <a href="${esc(r.team_url)}" target="_blank" rel="noopener">${esc(r.team_url)}</a> with password <code>${esc(r.demo.password)}</code>:</p>
+          <ul class="hlist two">${r.demo.employees.map(x => `<li><div><b>${esc(x.name)}</b><small>${esc(x.designation)} · ${esc(x.dept)}</small></div><code>${esc(x.email)}</code></li>`).join('')}</ul>
+          <div><button type="button" class="btn danger" id="demoRm">Remove demo data</button></div>` : '<div><button type="button" class="btn" id="demoAdd">Add demo data</button></div>'}
+        <p class="muted small"><a href="${X.base}/settings/outbox">Open the Outbox</a> to see every email the system wrote for your company.</p></div></section>
       <section class="section" id="attapp"><header><h2>Attendance app</h2><p>Employees check in from their phone. Office check-in only works inside the office; field and branch visits work anywhere with a note and location.</p></header><div class="stack">
         <label class="field"><span class="lab">How is attendance recorded?</span><select name="ci_mode">${opt('manual', 'HR marks it on this dashboard (unmarked = present)', S.checkin.mode)}${opt('app', 'Employees check in on the app (no check-in = absent)', S.checkin.mode)}</select></label>
         <div id="ciopts" class="stack">
@@ -780,7 +833,8 @@ async function settings(p = []) {
     }, e => { b.disabled = false; b.textContent = '📍 Use my current location'; toast('Location was not shared: ' + e.message); }, { enableHighAccuracy: true, timeout: 20000 });
   };
   $('#myip').onclick = ev => { const ip = ev.target.dataset.ip; if (!ip) return toast('Your IP could not be read.'); const t = f.elements.ci_ips; if (!t.value.split('\n').includes(ip)) t.value = (t.value.trim() ? t.value.trim() + '\n' : '') + ip; };
-  if (p[0] === 'fb' || p[0] === 'attendance') setTimeout(() => $(p[0] === 'fb' ? '#fb' : '#attapp').scrollIntoView({ block: 'start' }), 50);
+  const anchor = { fb: '#fb', attendance: '#attapp', brand: '#brand', testing: '#testing' }[p[0]];
+  if (anchor) setTimeout(() => $(anchor).scrollIntoView({ block: 'start' }), 50);
   f.onsubmit = async ev => {
     ev.preventDefault(); const e = f.elements, v = n => e[n].value, ck = n => e[n].checked;
     const body = { work_days: $$('[name=wd]:checked', f).map(x => +x.value), office_start: v('office_start'), office_end: v('office_end'), late_after_min: v('late_after_min'), timezone: v('timezone'), currency: v('currency'),
@@ -791,9 +845,24 @@ async function settings(p = []) {
       hr_email: v('hr_email'), webhook: v('webhook'), notify_candidates: ck('notify_candidates'), notify_shortlist: ck('notify_shortlist'), auto_regret: ck('auto_regret'), celebrate: ck('celebrate'),
       letters: { offer: v('l_offer'), appointment: v('l_appointment'), experience: v('l_experience') },
       checkin: { mode: v('ci_mode'), require_location: ck('ci_loc'), require_ip: ck('ci_ip'), allow_field: ck('ci_field'), allow_branch: ck('ci_branch'), offices: ledRead('offices'), ips: v('ci_ips') },
-      facebook: { page_id: v('fb_page'), token: v('fb_token') } };
-    await busy($('button.primary', f), async () => { try { X.S = (await X.api('settings', { method: 'PUT', body })).settings; toast('Settings saved'); } catch (er) { fail('sErr', er); } });
+      facebook: { page_id: v('fb_page'), token: v('fb_token') }, brand: { app_name: v('b_name'), color: v('b_color') } };
+    const lf = e.b_logo.files && e.b_logo.files[0];
+    if (lf) { if (lf.size > 200000) return fail('sErr', new Error('The logo is larger than 200 KB.')); body.brand.logo = await new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.onerror = rej; fr.readAsDataURL(lf); }); }
+    await busy($('button.primary', f), async () => { try { X.S = (await X.api('settings', { method: 'PUT', body })).settings; toast('Settings saved'); if (lf) settings(['brand']); } catch (er) { fail('sErr', er); } });
   };
+  const prev = () => { const c = f.elements.b_color.value; $('#bprev').style.setProperty('--bc', c); $('#bprev b').textContent = f.elements.b_name.value || r.company; };
+  f.elements.b_color.oninput = prev; f.elements.b_name.oninput = prev; prev();
+  const rm = $('#blrm'); if (rm) rm.onclick = () => busy(rm, async () => { try { X.S = (await X.api('settings', { method: 'PUT', body: { brand: { logo: '' } } })).settings; toast('Logo removed'); settings(['brand']); } catch (er) { toast(er.message); } });
+  const da = $('#demoAdd'); if (da) da.onclick = () => busy(da, async () => { try { await X.api('demo', { method: 'POST' }); X.S = (await X.api('settings')).settings; toast('Demo data added'); settings(['testing']); } catch (er) { toast(er.message); } });
+  const dr = $('#demoRm'); if (dr) dr.onclick = () => busy(dr, async () => { if (!confirm('Remove all demo employees, their attendance and leave, and the demo job?')) return; try { const x = await X.api('demo', { method: 'DELETE' }); toast(`Removed ${x.removed} demo employees`); settings(['testing']); } catch (er) { toast(er.message); } });
+}
+async function outbox(id) {
+  const r = await X.api('outbox');
+  X.v.innerHTML = `<a class="muted small" href="${X.base}/settings">← Settings</a>${head('Outbox', 'Every email the system wrote for your company: to candidates, employees and you. In test mode they are kept here instead of being sent; open one to read it and click its links.')}
+    <section class="hcard flush">${r.emails.length ? `<div class="scroll"><table class="t"><thead><tr><th>When</th><th>To</th><th>Subject</th><th>Status</th><th></th></tr></thead><tbody>${r.emails.map(x => `<tr ${String(x.id) === String(id) ? 'class="on"' : ''}><td class="nowrap">${fmtDateTime(x.created_at)}</td><td>${esc(x.to_addr)}</td><td>${esc(x.subject)}</td>
+      <td>${x.status === 'sent' ? pill('Sent', 'good') : x.status === 'held' ? pill('Not sent (test)', 'warn') : pill('Failed', 'bad')}</td><td><a class="btn small" href="${X.base}/settings/outbox/${x.id}">Open</a></td></tr>`).join('')}</tbody></table></div>` : '<p class="muted" style="padding:22px">No emails yet.</p>'}</section>
+    ${id ? `<div class="mailframe"><iframe src="${X.raw}outbox/${encodeURIComponent(id)}" title="Email" sandbox="allow-popups allow-popups-to-escape-sandbox"></iframe></div>` : ''}`;
+  if (id) setTimeout(() => $('.mailframe').scrollIntoView({ behavior: 'smooth' }), 80);
 }
 function ledRow(cols, it) {
   return `<div class="lrow" data-key="${esc(it.key || '')}">${cols.map(([k, l, t]) => t === 'bool' ? `<label class="check"><input type="checkbox" data-k="${k}" ${it[k] ? 'checked' : ''}> ${l}</label>`

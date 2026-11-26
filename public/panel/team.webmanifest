@@ -1,7 +1,7 @@
 {
   "id": "/team",
-  "name": "Briefbox Team",
-  "short_name": "Team",
+  "name": "Employee app",
+  "short_name": "Employee app",
   "description": "Check in, apply for leave and see your payslips.",
   "start_url": "/team#/",
   "scope": "/team",

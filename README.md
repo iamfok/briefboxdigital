@@ -150,6 +150,29 @@ Eta ekta **product** (Admin → Products e "AI HR Automation" naam e auto toiri 
 - **Import CVs:** upload many CVs (PDF/Word/photo) from Bdjobs, Facebook, email and so on. AI reads the name, email and phone, gives a score and shortlists. Every candidate gets an email: shortlisted, or received (an automatic "not selected" is optional).
 - **Hire:** after the interview HR clicks Hire → designation, department, joining date, salary, manager. The employee profile is created and the **appointment letter** is emailed with an app setup link. Template: Settings → Letters.
 
+
+### HR v3: teams, company app link + branding, test mode, demo data
+
+**Teams:** HR → **Teams**. Every department is a team. Choose a team lead. The lead sees "My team" in the app (who is in today) and approves the team's leave (leave requests go to the lead too). Each team card shows today's present/late/absent/on leave, this month's attendance %, waiting leave, open jobs and net pay. "Team report" shows the reports page for that team only (with CSV download). Attendance, Leave and Reports have a team filter at the top.
+
+**Each client company has its own app link:** `briefboxdigital.com/team/<company code>` (for example `/team/retro`).
+- Login works only for that company's employees. A session from one company cannot open another company's link.
+- Every company's data is kept separate by company inside the database (every query is limited to the company).
+- Invite, leave, payslip and appointment emails all use this link. Old `/team` links redirect to the company link automatically.
+
+**Branding:** HR Settings → **Branding**: app name, colour and logo (square PNG, under 200 KB).
+- The employee app, login page, phone home-screen icon/name, careers page and emails all show only the company's brand. Briefbox is not mentioned anywhere.
+- Later, to use your own domain (e.g. `hr.retro.com`): add that domain to the Worker in Cloudflare and point it at `/team/retro`.
+
+**Test mode (emails not sent):** Admin → Automations → Billing settings → Emails → Mode = **Test mode**. It is on by default after this update.
+- No email goes out. Every email waits in the **Outbox** (admin sees all of them, HR sees its own in Settings → Outbox).
+- Open an email and click its buttons (Set password, Accept offer…) to test everything by hand.
+- Set Mode = Live when you go live.
+
+**Testing without email:**
+- Employee profile → **Set app password**: HR sets the password and gives it to the employee directly.
+- HR Settings → **Try it with demo data** → "Add demo data". This adds 8 demo employees in 4 teams (with leads), this month's attendance, today's check-ins, leave requests and a job with applicants. Every demo employee's password is `demo1234`. "Remove demo data" deletes it all in one click (real data is not touched).
+
 ## 6. SEO, alt text, speed
 
 - **Alt text:** Media Library te protiti image er niche "Alt text" likho (Enter/bahire click korle save). Cover field er pashe **Cover alt** field ache; khali thakle Media Library er alt, tarpor page heading use hoy. Blog body te image dite **Copy HTML** chapo, alt soho ashe.

@@ -472,6 +472,10 @@ async function renderMail() {
     box.innerHTML = `<form id="mf">
       <section class="section"><header><h2>Emails to clients</h2><p>Sent automatically: order confirmation with the invoice, payment received, receipt, automation approved and welcome. You get a copy of new orders, payments and sign-ups.</p></header>
         <div class="stack">
+          <label class="field"><span class="lab">Mode</span><select name="mode">
+            <option value="test" ${m.mode === 'test' ? 'selected' : ''}>Test mode: don't send, keep every email in the Outbox below</option>
+            <option value="live" ${m.mode === 'live' ? 'selected' : ''}>Live: send emails</option></select></label>
+          ${m.mode === 'test' ? '<p class="note warn small">Test mode is on. No email leaves the website, for clients, candidates or employees. Open an email below to read it and click its links (set password, accept offer…). HR clients see their own emails in HR → Settings → Outbox.</p>' : ''}
           <label class="field"><span class="lab">Send emails with</span><select name="provider">
             <option value="" ${!m.provider ? 'selected' : ''}>Off</option><option value="resend" ${m.provider === 'resend' ? 'selected' : ''}>Resend (recommended, free up to 3,000 emails a month)</option>
             <option value="n8n" ${m.provider === 'n8n' ? 'selected' : ''}>My n8n workflow (Gmail or SMTP node)</option></select></label>
@@ -482,9 +486,12 @@ async function renderMail() {
             <div data-p="n8n">${field('n8n webhook URL', 'webhook', m.webhook, { hint: 'Webhook node (POST). It receives to, subject, html, text' })}</div></div>
         </div></section>
       <div class="savebar" style="position:static"><span class="error" id="mErr" role="alert"></span><button class="btn" type="button" id="mTest">Send test email</button><button class="btn primary" type="submit">Save email settings</button></div></form>
-      <section class="section"><header><h2>Recent emails</h2><p>The last 30 emails and whether they were sent.</p></header>
-        ${m.log.length ? `<div class="scroll"><table class="t"><tr><th>When</th><th>To</th><th>Subject</th><th>Status</th></tr>${m.log.map(x => `<tr><td>${fmtDateTime(x.created_at)}</td><td>${esc(x.to_addr)}</td><td>${esc(x.subject)}</td>
-          <td>${x.status === 'sent' ? '<span class="pill good">sent</span>' : `<span class="pill bad">failed</span><div class="muted small">${esc(x.error)}</div>`}</td></tr>`).join('')}</table></div>` : '<p class="muted">No emails yet.</p>'}</section>`;
+      <section class="section"><header><h2>${m.mode === 'test' ? 'Outbox' : 'Recent emails'}</h2><p>The last 50 emails. Click one to open it.</p></header>
+        ${m.log.length ? `<div class="scroll"><table class="t"><tr><th>When</th><th>To</th><th>Subject</th><th>Status</th><th></th></tr>${m.log.map(x => `<tr><td>${fmtDateTime(x.created_at)}</td><td>${esc(x.to_addr)}</td><td>${esc(x.subject)}</td>
+          <td>${x.status === 'sent' ? '<span class="pill good">sent</span>' : x.status === 'held' ? '<span class="pill warn">not sent (test)</span>' : `<span class="pill bad">failed</span><div class="muted small">${esc(x.error)}</div>`}</td>
+          <td><button type="button" class="btn small" data-mail="${x.id}">Open</button></td></tr>`).join('')}</table></div>` : '<p class="muted">No emails yet.</p>'}
+        <div id="mailView"></div></section>`;
+    $$('[data-mail]', box).forEach(btn => btn.onclick = () => { $('#mailView').innerHTML = `<div class="mailframe"><div class="row-end"><button type="button" class="btn small" id="mvx">Close</button></div><iframe src="/api/admin/le/mail/${btn.dataset.mail}/html" title="Email" sandbox="allow-popups allow-popups-to-escape-sandbox"></iframe></div>`; $('#mvx').onclick = () => { $('#mailView').innerHTML = ''; }; $('#mailView').scrollIntoView({ behavior: 'smooth' }); });
     const f = $('#mf'), sel = f.elements.provider, show = () => $$('[data-p]', f).forEach(x => { x.hidden = x.dataset.p !== sel.value; });
     sel.onchange = show; show();
     const save = async () => { m = await api('/mail', { method: 'PUT', body: Object.fromEntries(new FormData(f)) }); };

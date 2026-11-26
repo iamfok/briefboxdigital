@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Careers', icons: { icon: '/assets/mark.png' } };
 export const viewport = { themeColor: '#f6f5fb', colorScheme: 'light' };
 
-const V = '20261126b';
+const V = '20261126e';
 export default function Careers() {
   return (
     <>

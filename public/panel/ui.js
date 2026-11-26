@@ -9,10 +9,10 @@ function toast(msg) {
   const t = $('#toast'); t.textContent = msg; t.hidden = false;
   clearTimeout(toast.t); toast.t = setTimeout(() => { t.hidden = true; }, 3600);
 }
-function makeApi(prefix, onAuth) {
+function makeApi(prefix, onAuth, extra = {}) {
   return async function api(path, opts = {}) {
     const res = await fetch(prefix + path, { method: opts.method || 'GET', credentials: 'same-origin',
-      headers: opts.body ? { 'Content-Type': 'application/json' } : {}, body: opts.body ? JSON.stringify(opts.body) : undefined });
+      headers: { ...extra, ...(opts.body ? { 'Content-Type': 'application/json' } : {}) }, body: opts.body ? JSON.stringify(opts.body) : undefined });
     let data = {}; try { data = await res.json(); } catch (e) {}
     if (res.status === 401 && !opts.noAuthRedirect) { onAuth(); const e = new Error(data.error || 'Please sign in.'); e.auth = true; throw e; }
     if (!res.ok) { const e = new Error(data.error || ('Request failed (' + res.status + ')')); e.errors = data.errors; throw e; }

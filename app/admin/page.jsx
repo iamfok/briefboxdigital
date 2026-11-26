@@ -2,7 +2,7 @@
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Admin Panel | Briefbox Digital', robots: 'noindex,nofollow', icons: { icon: '/assets/mark.png' } };
 
-const V = '20261126d';
+const V = '20261126e';
 export default function Admin() {
   return (
     <>

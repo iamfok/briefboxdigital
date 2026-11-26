@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Client portal | Briefbox Digital', robots: 'noindex,nofollow', icons: { icon: '/assets/mark.png' } };
 export const viewport = { themeColor: '#f6f5fb', colorScheme: 'light' };
 
-const V = '20261126b';
+const V = '20261126e';
 export default function Portal() {
   return (
     <>
